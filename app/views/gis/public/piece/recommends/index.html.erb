@@ -1,0 +1,12 @@
+<div id="recommendSearch">
+  <ul>
+    <%- for item in @items -%>
+    <li>
+      <a href="<%=item.url_for_search%>">
+      <%- if item.icon_uri.present? -%><%= image_tag(item.icon_uri) %><%- end -%>
+      <span class="<%=item.name%>"><%=item.title%></span>
+      </a>
+    </li>
+    <%- end -%>
+  </ul>
+</div>

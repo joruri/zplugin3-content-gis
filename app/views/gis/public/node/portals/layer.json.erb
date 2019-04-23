@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features":[
+      <%- @items.each_with_index do | item, i |
+        next unless feature = item[:feature]
+        next unless entry = item[:entry]
+      -%>
+      {
+        "type":"Feature",
+        "id":"<%= entry.name %>",
+        "geometry":{
+          "type": "<%= feature['type'] %>",
+          "coordinates": <%= feature['coordinates'] %>
+        },
+        "geometry_name":"geom",
+        "properties":{
+          "gis_layer" : "<%= @layer.name %>",
+          "id": "<%= entry.name %>",
+          "url": "<%= @node.public_uri %>detail/<%= entry.name %>",
+          "icon": "<%= entry.icon_uri.present? ? entry.icon_uri : '/_common/themes/openlayers/images/marker.png' %>"
+        }
+      }<%- if i < (@entries.size - 1) -%>,<%- end -%>
+    <%- end -%>
+  ]
+}

@@ -1,0 +1,27 @@
+<h2><%= menu_header @content.name, Gis::Registration.model_name.human %></h2>
+
+<div class="actionMenu">
+<%- case action_name -%>
+<%- when 'index' -%>
+  <%= link_to '未処理', { target_state: 'draft' }, (params[:target_state] == 'draft' ? {class: 'current'} : {}) %>
+  <%= link_to '公開済', { target_state: 'public' }, (params[:target_state] == 'public' ? {class: 'current'} : {}) %>
+  <%= link_to '非公開', { target_state: 'closed' }, (params[:target_state] == 'closed' ? {class: 'current'} : {}) %>
+  <%= link_to '全申請', { target_state: 'all' }, (params[:target_state] == 'all' ? {class: 'current'} : {}) %>
+<%- when 'show' -%>
+  <%= link_to :index, { action: :index } %>
+  <span class="separator"></span>
+  <%= link_to :edit, { action: :edit } if @item.editable?%>
+  <%= link_to '下書き保存', { action: :copy }, method: :post,
+    confirm: 'この申請情報を下書き状態で「地理情報」にコピーします。「地理情報」から施設情報のプレビューが確認できます。' if @item.copyable? %>
+  <%= link_to :publish, { action: :publish }, method: :post,
+    confirm: 'この申請情報を公開します。公開することで「地理情報」にデータがコピーされ、公開画面の検索結果に表示されるようになります。' if @item.publishable? %>
+  <%= link_to :close, { action: :close }, method: :post,
+    confirm: 'この申請情報を非公開にします。' if @item.closable? %>
+<%- when 'new', 'create', 'import' -%>
+  <%= link_to :index, { action: :index } %>
+<%- when 'edit', 'update' -%>
+  <%= link_to :index, { action: :index } %>
+  <span class="separator"></span>
+  <%= link_to :show, { action: :show } %>
+<%- end -%>
+</div>

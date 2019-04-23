@@ -1,0 +1,6 @@
+<table class="show categories">
+  <tr>
+    <th><%= @item.class.human_attribute_name :in_category_ids %></th>
+    <td><%= @item.in_categories.map(&:title).join(', ')%></td>
+  </tr>
+</table>

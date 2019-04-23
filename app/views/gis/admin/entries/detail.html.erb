@@ -1,0 +1,16 @@
+
+<p class="form">詳細情報<%= link_to '[閲覧]', gis_entry_path(content: @content, id: @item)%></p>
+<%- if @item.db -%>
+<%= render 'webdb/admin/shared/show', db: @item.db, item_values: @item.item_values,
+  files: @item.files,  file_uri: @item.file_content_uri, replace: true %>
+<%- else -%>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+</table>
+<%- end -%>
+
+<%= render 'gis/admin/_partial/categories/view', item: @item%>
+

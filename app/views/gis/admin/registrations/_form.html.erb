@@ -1,0 +1,19 @@
+<%= init_ckeditor baseHref: "#{gis_entries_path(content: @content, id: @item.id.to_i)}/" %>
+
+<%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+
+<table class="show" id="normal_body_form" style="<%= 'display:none;' if @item.db %>">
+  <tr>
+    <th><%= f.label :title %> <span class="note">※</span></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  </tr>
+</table>
+
+<%= render 'gis/admin/shared/form_database', f: f, item: @item, content: @content %>
+
+<%= render 'sys/admin/_partial/files/form', f: f, item: @item, content: @content %>
+
+<p class="form">位置情報</p>
+<%= gis_map_form f %>
+
+<%= creator_form f %>

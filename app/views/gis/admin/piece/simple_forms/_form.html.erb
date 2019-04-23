@@ -1,0 +1,114 @@
+<%= render 'shared/admin/piece/form', f: f do -%>
+<p class="form">詳細設定</p>
+<table class="show">
+  <tr>
+    <th><%= f.label :upper_text %></th>
+    <td><%= f.array_text_area 'in_settings[upper_text]', class: 'body' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :lower_text %></th>
+    <td><%= f.array_text_area 'in_settings[lower_text]', class: 'body' %></td>
+  </tr>
+</table>
+
+<% if @item.titles.present? -%>
+  <%- @item.titles.each do |i, title| -%>
+  <table class="show recommendTitles">
+    <tr>
+      <th><%= f.label :in_titles %><%= link_to '削除', '#', class: 'remove_row' %></th>
+      <td><%= text_field_tag "in_titles[#{i}]", title %></td>
+    </tr>
+    <tr>
+      <th><%= f.label :in_recommend_ids %></th>
+      <td class="recommends">
+        <%- @item.content.recommends_for_option.each do |r| -%>
+          <%= check_box_tag "in_recommend_ids[#{i}][]", r[1],
+          @item.in_recommend_ids[i].present? ? @item.in_recommend_ids[i].include?(r[1].to_s) : false,
+          id: "recommend_#{i}_#{r[1]}" %>
+          <label for="<%= %Q(recommend_#{i}_#{r[1]}) %>"><%= r[0] %></label>
+        <%- end %>
+      </td>
+    </tr>
+    <tr>
+      <th><%= f.label :in_lower_texts %></th>
+      <td class="lower_texts">
+        <%= text_area_tag "in_lower_texts[#{i}]", @item.in_lower_texts[i] %>
+      </td>
+    </tr>
+  </table>
+  <%- end -%>
+<%- else -%>
+<table class="show recommendTitles">
+  <tr>
+    <th><%= f.label :in_titles %><%= link_to '削除', '#', class: 'remove_row' %></th>
+    <td><%= text_field_tag 'in_titles[0]', '' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :in_recommend_ids %></th>
+    <td class="recommends">
+      <%- @item.content.recommends_for_option.each do |r| -%>
+        <%= check_box_tag "in_recommend_ids[0][]", r[1], false, id: "recommend_#{0}_#{r[1]}" %>
+        <label for="<%= %Q(recommend_#{0}_#{r[1]}) %>"><%= r[0] %></label>
+      <%- end %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= f.label :in_lower_texts %></th>
+    <td class="recommends">
+      <%= text_area_tag "in_lower_texts[0]", '' %>
+    </td>
+  </tr>
+</table>
+<%- end -%>
+
+
+<%= button_tag '追加', type: 'button', class: 'add_button' %>
+
+<%= javascript_tag do %>
+$(function() {
+
+  $(document).on("click", "a.remove_row", function (e) {
+    if ( $('.recommendTitles').length == 1) {
+      $('.recommendTitles:last').find('input, label, select, textarea').each(function() {
+        $(this).val('');
+        $(this).prop('checked', false);
+      });
+    } else {
+      $(this).parent().parent().parent().parent().remove();
+    }
+    return false;
+  });
+
+  $('.add_button').click(function(e) {
+    var idx = $(".recommendTitles").length;
+    var clone = $(".recommendTitles:last").clone();
+    clone.find('input:text').each(function() {
+      var name = $(this).attr('name');
+      $(this).attr('name', name.replace(/in_titles\[\d+\]/, 'in_titles[' + idx + ']'));
+      $(this).val('');
+    });
+
+    clone.find('input:checkbox').each(function() {
+      var id = $(this).attr('id');
+      $(this).attr('id', id.replace(/recommend_\d+/, 'recommend_' + idx ));
+
+      var name = $(this).attr('name');
+      $(this).attr('name', name.replace(/in_recommend_ids\[\d+\]/, 'in_recommend_ids[' + idx + ']'));
+
+      $(this).prop('checked', false);
+    });
+
+    clone.find('label').each(function() {
+      var id = $(this).attr('for');
+      $(this).attr('for', id.replace(/recommend_\d+/, 'recommend_' + idx ));
+    });
+
+    $(".recommendTitles:last").after(clone);
+    return false;
+  });
+});
+<% end %>
+
+
+
+<%- end -%>

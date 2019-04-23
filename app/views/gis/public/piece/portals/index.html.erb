@@ -1,0 +1,14 @@
+<%- @portal_maps.each do |portal|%>
+<div>
+  <a href="<%= @node.public_uri %>/<%=portal.name%>" class="title  <%=portal.state_text%>">
+  <span class="mapTitle"><%=portal.title%></span>
+  </a>
+  <div class="img">
+    <a href="<%=portal.public_uri%>" class="<%=portal.state_text%>">
+      <img src="" alt=""/>
+      <span class="imgMini"><img src="<%= portal.tumbnail_src %>" alt="" /></span>
+    </a>
+  </div>
+  <div class="text"><%= portal.body.html_safe %></div>
+</div>
+<%- end -%>

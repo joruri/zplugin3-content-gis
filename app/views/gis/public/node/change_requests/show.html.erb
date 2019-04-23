@@ -1,0 +1,12 @@
+<div id="gisContent">
+  <script src="/_common/js/cms_admin/cms.js"></script>
+  <%= form_for @item, as: :item, url: "#{@node.public_uri}#{@target.name}/confirm", html: { method: :post, multipart: true } do |f| %>
+    <div class="message">
+      <%= sanitize @content.form_message_text %>
+    </div>
+    <%= error_messages_for :item %>
+    <%= render 'gis/public/_partial/registrations/form', f: f %>
+    <%= submit_tag '確認する', id: 'confirm' %>
+  <% end %>
+
+</div>

@@ -1,0 +1,18 @@
+<%= render 'shared/admin/piece/form', f: f do -%>
+<p class="form">詳細設定</p>
+
+<table class="show">
+  <tr>
+    <th><%= f.label :message_text %></th>
+    <td><%= f.array_text_field 'in_settings[message_text]', style: 'width: 500px;' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :unit_text %></th>
+    <td><%= f.array_text_field 'in_settings[unit_text]' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :target_db_id %></th>
+    <td><%= f.array_select 'in_settings[target_db_id]', @item.target_dbs_for_option, include_blank: true %></td>
+  </tr>
+</table>
+<%- end -%>

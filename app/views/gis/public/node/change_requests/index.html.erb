@@ -1,0 +1,27 @@
+<div id="gisContent">
+  <%= form_tag "#{@node.public_uri}", method: :get, class: 'search' do |f| %>
+    <%= hidden_field_tag 'target', @registration_db.try(:id) %>
+    <div class="search_keyword">
+        <div class="title">変更したい施設の名称等で検索してください。</div>
+        <div class="conditions">
+          <div>
+            <%= text_field_tag "keyword", params[:keyword], placeholder: '施設名・住所・電話番号など' %>
+          </div>
+        </div>
+    </div>
+  <div class="submitters">
+    <button type="submit">検索</button>
+  </div>
+  <%- end -%>
+  <% if @items.present?%>
+    <ul class="requestList">
+    <%- for item in @items -%>
+       <li class="entry">
+      <%= link_to item.title, "#{@node.public_uri}#{item.name}" %>
+      </li>
+    <%- end -%>
+    </ul>
+  <%- end -%>
+
+</div>
+

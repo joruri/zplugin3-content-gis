@@ -1,0 +1,12 @@
+<% if @db.present? %>
+  <%= gis_window_text(@item, @content.window_text) %>
+<% else %>
+  <%= link_to @item.title, @item.public_uri %>
+<% end %>
+<% for marker in @nearby_markers %>
+  <% if @db.present? %>
+    <%= gis_window_text(marker, @content.window_text) %>
+  <% else %>
+    <%= link_to marker.title, marker.public_uri %>
+  <% end %>
+<%- end -%>

@@ -1,0 +1,44 @@
+<%= f.hidden_field :lat%>
+<%= f.hidden_field :lng%>
+<%- if @registration_db -%>
+  <%- @registration_db.items.each do |item|
+    param = @item.item_values[item.name]
+    next if param.blank?%>
+    <%- case item.item_type
+      when 'check_box', 'check_data'
+        param.each do |key, p|
+          p.each do |c|-%>
+          <%= hidden_field_tag "item[item_values][#{item.name}][#{key}][]", c%>
+          <%- end -%>
+        <%- end
+      when 'ampm'
+        param.each do |key, p|
+          p.each do |c_key, c|-%>
+          <%= hidden_field_tag "item[item_values][#{item.name}][#{key}][#{c_key}]", c%>
+          <%- end -%>
+        <%- end
+      when 'blank_date', 'blank_weekday', 'office_hours'
+        param.each do |key, p| -%>
+          <%= hidden_field_tag "item[item_values][#{item.name}][#{key}]", p%>
+        <%- end
+      else
+        if param.kind_of?(Array)
+          param.each do |p|-%>
+          <%= hidden_field_tag "item[item_values][#{item.name}][]", p%>
+        <%- end
+         else %>
+          <%= hidden_field_tag "item[item_values][#{item.name}]", param %>
+        <%- end -%>
+    <%- end -%>
+  <%- end -%>
+<%- else -%>
+  <%= f.hidden_field :title%>
+<%- end -%>
+<%- @item.in_categories.each do |c| %>
+  <%= hidden_field_tag "item[in_category_ids][]", c.id %>
+<%- end -%>
+
+<%- @item.attachments.each_with_index do |u, i| %>
+<%= hidden_field_tag "item[upload_attachments][][name]", u&.title %>
+<%= hidden_field_tag "item[upload_attachments][][data]", Base64.strict_encode64(u&.data) if u&.data %>
+<%- end %>

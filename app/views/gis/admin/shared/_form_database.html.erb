@@ -1,0 +1,41 @@
+<%- if content.form_db_available? -%>
+  <%- if content.form_dbs.size == 1 && item.db -%>
+    <%= f.hidden_field :db_id %>
+  <%- else -%>
+    <table class="show">
+      <tr>
+        <th><%= f.label :db_id %></th>
+        <td colspan="3"><%= f.select :db_id, content.form_db_options, include_blank: true %></td>
+      </tr>
+    </table>
+  <%- end -%>
+<%- end -%>
+<div id="database_body_form">
+  <%= render 'webdb/admin/shared/form', db: item.db, item_values: item.item_values, use_admin: true if item.db %>
+</div>
+<%- if content.webdb_content_db -%>
+<script type="text/javascript">
+$(document).ready(function() {
+
+
+  var prevTemplateId;
+  $('#item_db_id').on('click', function() {
+    prevDbId = $(this).val();
+  }).on('change', function() {
+    if (!confirm('データベースを変更してよろしいですか？')) {
+      $(this).val(prevTemplateId);
+    }
+    if (this.value) {
+      $.post('<%= build_webdb_db_items_path(content.webdb_content_db, db_id: '_ID_') %>'.replace(/_ID_/, this.value), $('form').serialize(), function(data) {
+        $('#database_body_form').html(data);
+      });
+      $('#normal_body_form').hide();
+      $('#database_body_form').show();
+    } else {
+      $('#normal_body_form').show();
+      $('#database_body_form').hide().html('');
+    }
+  });
+});
+</script>
+<%- end -%>

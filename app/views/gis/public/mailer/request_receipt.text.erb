@@ -1,0 +1,6 @@
+<%- if @title.present? -%>
+「<%= @form_request.content.name %>」の「<%= @title %>」の情報が変更されました。
+<%- else - %>
+「<%= @form_request.content.name %>」に登録申請が届きました。
+<%- end -%>
+<%= render 'answers' %>

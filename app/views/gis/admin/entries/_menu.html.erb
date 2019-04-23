@@ -1,0 +1,32 @@
+<h2><%= menu_header @content.name, Gis::Entry.model_name.human %></h2>
+<div class="actionMenu">
+<%- case action_name -%>
+<%- when 'index' -%>
+  <%= link_to :new, { action: :new } if Core.user.has_priv?(:create, item: Core.concept) %>
+  <span class="separator"></span>
+  <%= link_to '一覧表示', { action: :index }, (params[:maps].blank? ? {class: 'current'} : {}) %>
+  <%= link_to '地図表示', { action: :index, maps: true }, (params[:maps].present? ? {class: 'current'} : {}) %>
+  <span class="separator"></span>
+  <%= link_to '全一覧', { target_state: 'all' }, (params[:target_state] == 'all' ? {class: 'current'} : {}) %>
+  <%= link_to '公開前', { target_state: 'draft' }, (params[:target_state] == 'draft' ? {class: 'current'} : {}) %>
+  <%= link_to '公開済', { target_state: 'public' }, (params[:target_state] == 'public' ? {class: 'current'} : {}) %>
+  <%= link_to '公開終了', { target_state: 'closed' }, (params[:target_state] == 'closed' ? {class: 'current'} : {}) %>
+  <span class="separator"></span>
+  <%= link_to 'エクスポート', gis_exports_path %>
+  <%= link_to 'インポート', gis_imports_path  if Core.user.has_auth?(:designer) %>
+<%- when 'show' -%>
+  <%= link_to :index, { action: :index } %>
+  <span class="separator"></span>
+  <%= link_to :edit, { action: :edit } if @item.editable?%>
+  <%= link_to :destroy, { action: :destroy }, method: :delete, confirm: '削除してよろしいですか？' if @item.deletable? %>
+  <%= link_to '承認', { action: :approve }, method: :post, confirm: '承認してよろしいですか？' if @item.approvable?(Core.user) %>
+  <%= link_to :publish, { action: :publish }, method: :post, confirm: '公開してよろしいですか？' if @item.publishable? %>
+  <%= link_to '公開終了', { do: :close }, confirm: '公開を終了してよろしいですか？' if @item.closable? %>
+<%- when 'new', 'create', 'import' -%>
+  <%= link_to :index, { action: :index } %>
+<%- when 'edit', 'update' -%>
+  <%= link_to :index, { action: :index } %>
+  <span class="separator"></span>
+  <%= link_to :show, { action: :show } %>
+<%- end -%>
+</div>

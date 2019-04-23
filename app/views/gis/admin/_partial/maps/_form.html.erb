@@ -1,0 +1,143 @@
+<%= javascript_include_tag '/_common/js/openlayers/ol.js' %>
+<%= javascript_include_tag '/_common/modules/cms/js/openlayers.js' %>
+
+<%-
+default_position = default_map_position(item.content)
+map_lat  = item.lat.presence || default_position[0]
+map_lng  = item.lng.presence || default_position[1]
+map_zoom = item.content.try(:map_default_zoom) || 14
+-%>
+<script type="text/javascript">
+//<![CDATA[
+var map = null;
+var me = null;
+
+$(function() {
+
+  map = new OpenLayersEditor('map1', '<%= @content.site.map_source %>', <%= map_lat.to_f %>, <%= map_lng.to_f %>, <%= map_zoom.to_i %>);
+
+  <%- if item.lng.present? && item.lat.present? -%>
+  var markers = [{
+      id: 'marker',
+      lat: <%=item.lat.presence %>,
+      lng: <%= item.lng.presence %>,
+      content: '',
+      icon: ''
+    }];
+  map.create_markers(markers);
+  <%- elsif item.geom.present? && wkt = item.geom.as_text -%>
+  var wkt = $("#geometry").val();
+  if ( wkt != '' ){
+    var format = new ol.format.WKT();
+    var feature = format.readFeature(wkt, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      });
+    var vector = new ol.layer.Vector({
+      map: map._map_canvas,
+      source: new ol.source.Vector({
+        features: [feature]
+      })
+    });
+    map._map_canvas.addLayer(vector);
+    var extent = feature.getGeometry().getExtent();
+    map._map_canvas.getView().fit(extent);
+
+    var select = new ol.interaction.Select({layers : [vector]});
+    map._map_canvas.addInteraction(select);
+
+    var modify = new ol.interaction.Modify({
+      features: select.getFeatures()
+    });
+    map._map_canvas.addInteraction(modify);
+    modify.on('modifyend',function(e){
+      var format = new ol.format.WKT();
+      var wktStr = format.writeGeometry(e.features.getArray()[0].getGeometry(),
+        {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857'
+        });
+      $("#geometry").val(wktStr);
+    });
+
+  }
+  $("#markerForm").hide();
+  $("#currentView").hide();
+  <%- else -%>
+  var markers = [];
+  map.create_markers(markers);
+  <%- end -%>
+
+  <% if column = item.content.geocoding_column %>
+    var geoCodeBtn = '';
+    $('#caption').prepend('<button id="geocode" type="button">住所からマップの座標を設定</button> または ');
+    $('#geocode').on('click', function (event) {
+      var address = $('#item_item_values_<%= column %>').val();
+      if ( address != '' ){
+        <%- if @node.present? -%>
+        var url = '<%= @node.public_uri %>geocode'
+        <%- else -%>
+        var url = '<%= url_for({action: :index}) %>/geocode'
+        <%- end -%>
+        $.post(url,
+          {
+            address: address,
+            authenticity_token: "<%=form_authenticity_token%>"
+          }, function(data) {
+            var coordinate = ol.proj.transform([data.lng, data.lat], 'EPSG:4326', 'EPSG:3857');
+            map._map_canvas.setView(new ol.View({
+              center: coordinate,
+              zoom: map._map_canvas.getView().getZoom()
+            }));
+
+            $('#clickDispLat').val(data.lat);
+            $('#clickDispLng').val(data.lng);
+            map._click_feature.setGeometry(new ol.geom.Point(coordinate));
+
+        });
+      }
+
+    });
+  <%- end -%>
+
+});
+
+//]]>
+</script>
+<%= f.hidden_field :name, id: "markerName", value: 'marker' %>
+<div id="mapForm" class="articleMapForm">
+  <div id="map1" class="mapCanvas"></div>
+  <div id="popup" class="ol-popup" style="display: none;">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content"></div>
+  </div>
+  <%= hidden_field_tag :geometry, item.geom.present? ? item.geom.as_text : nil %>
+
+  <table id="currentView" class="show markerForm" style="display: none;">
+    <caption>表示中のマップ情報</caption>
+    <tr>
+      <th>現在の座標</th>
+      <td class="point">
+        <input id="centerDispLat" name="centerDispLat" type="text" value="" readonly="readonly"
+        />.<input id="centerDispLng" name="centerDispLng" type="text" value="" readonly="readonly" />
+      </td>
+    </tr><tr>
+      <th>現在の縮尺</th>
+      <td class="zoom"><input id="zoomDisp" name="zoomDisp" type="text" value="" readonly="readonly" /></td>
+    </tr>
+  </table>
+
+
+  <table id="markerForm" class="show markerForm">
+    <caption id="caption">マップをクリックすることで位置を指定できます。</caption>
+    <tbody id="markerFormTbody">
+      <tr>
+        <th class="point">座標</th>
+        <td class="point">
+          <%= f.text_field :lat, id: "clickDispLat" %>.<!--
+          --><%= f.text_field :lng, id: "clickDispLng" %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

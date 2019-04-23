@@ -1,0 +1,30 @@
+<span class="note">※は必須項目です。</span>
+
+<p class="form">基本情報</p>
+
+<table class="show">
+  <tr>
+    <th><%= f.label :state %></th>
+    <td><%= f.collection_radio_buttons :state, @item.class.state_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :name, 'ID' %> <span class="note">※</span></th>
+    <td><%= f.text_field :name, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title, '名称' %> <span class="note">※</span></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :sort_no %></th>
+    <td><%= f.text_field :sort_no, class: 'number' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :icon_uri, 'アイコン画像URL' %></th>
+    <td><%= f.text_field :icon_uri, class: 'name', style: 'width: 500px;' %></td>
+  </tr>
+</table>
+
+<br />
+
+<%= creator_form f %>

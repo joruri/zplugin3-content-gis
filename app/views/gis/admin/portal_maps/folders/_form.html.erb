@@ -1,0 +1,79 @@
+<%= init_ckeditor baseHref: "#{gis_layer_path(content: @content, id: @item.id.to_i)}/" %>
+<span class="note">※は必須項目です。</span>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= f.label :state %></th>
+    <td><%= f.collection_radio_buttons :state, @item.class.state_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title %></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :sort_no %></th>
+    <td><%= f.text_field :sort_no, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :body %></th>
+    <td>
+      <%= f.text_area :body %>
+    </td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= f.label :message %></th>
+  </tr>
+  <tr>
+    <td class="cke_editor_wrapper">
+      <%= f.text_area :message, class: 'body ckeditor' %>
+    </td>
+  </tr>
+</table>
+<script type="text/javascript">
+$(function() {
+  $('#addLayerForm').on('click', function() {
+    var idx = $('#layerFormTbody tr').length;
+    var elem = $('#layerFormTbody tr:last').clone();
+    elem.find('input:text').removeAttr('value');
+
+    var html = elem.html()
+      .replace(/folder_layers_attributes_\d+/g, "folder_layers_attributes_" + idx)
+      .replace(/\[folder_layers_attributes\]\[\d+\]/g, "[folder_layers_attributes][" + idx + "]");
+    $('#layerFormTbody').append( $('<tr>').append(html) );
+    return false;
+
+  });
+});
+</script>
+
+<p class="form">レイヤー設定</p>
+<table id="layerForm" class="show layerForm">
+  <tbody id="layerFormTbody">
+  <%-
+  @item.build_default_layer
+  @item.folder_layers.each_with_index do |layer, i| -%>
+    <%= f.fields_for :folder_layers, layer do |f2| %>
+      <tr>
+        <th class="name">レイヤー</th>
+        <td class="name">
+          <%= f2.hidden_field :folder_id %>
+          <%= f2.select :layer_id, @content.layers_for_option, include_blank: true%>
+        </td>
+        <th class="point">並び順</th>
+        <td class="point">
+          <%= f2.text_field :sort_no %>
+        </td>
+      </tr>
+    <%- end -%>
+  <%- end -%>
+  </tbody>
+</table>
+<div class="addLayerForm">
+  <a href="#" id="addLayerForm">入力フォームを追加する</a>
+</div>
+
+<%= creator_form f %>
+

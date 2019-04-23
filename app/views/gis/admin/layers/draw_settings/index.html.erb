@@ -1,0 +1,6 @@
+
+<% if @items.blank? %>
+  <div class="notice">データは登録されていません。</div>
+<% else %>
+  <%= render :partial => 'show' %>
+<% end %>

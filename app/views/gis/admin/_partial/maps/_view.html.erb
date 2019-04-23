@@ -1,0 +1,60 @@
+<%= javascript_include_tag '/_common/js/openlayers/ol.js' %>
+<%= javascript_include_tag '/_common/modules/map/js/openlayers.js' %>
+
+<%-
+default_position = default_map_position(item.content)
+map_lat  = item.lat.presence || default_position[0]
+map_lng  = item.lng.presence || default_position[1]
+map_zoom = item.content.try(:map_default_zoom) || 14
+-%>
+<script type="text/javascript">
+//<![CDATA[
+var map = null;
+var me = null;
+
+$(function() {
+
+  map = new OpenLayersViewer('map1', '<%= @content.site.map_source %>', <%= map_lat.to_f %>, <%= map_lng.to_f %>, <%= map_zoom %>);
+
+  <%- if item.lng.present? && item.lat.present? -%>
+  var markers = [{
+      id: '<%= "#{item.lat.presence}_#{item.lng.presence}" %>',
+      lat: <%=item.lat.presence %>,
+      lng: <%= item.lng.presence %>,
+      content: '',
+      icon: ''
+    }];
+
+  map.create_markers(markers);
+  <%- elsif item.geom.present? && wkt = item.geom.as_text -%>
+
+  var wkt = $("#geometry").val();
+  if ( wkt != '' ){
+    var format = new ol.format.WKT();
+    var feature = format.readFeature(wkt, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      });
+    var vector = new ol.layer.Vector({
+      map: map._map_canvas,
+      source: new ol.source.Vector({
+        features: [feature]
+      })
+    });
+    map._map_canvas.addLayer(vector);
+    var extent = feature.getGeometry().getExtent();
+    map._map_canvas.getView().fit(extent);
+  }
+  <%- end -%>
+});
+
+//]]>
+</script>
+<div id="mapForm" class="articleMapForm">
+  <div id="map1"></div>
+  <div id="popup" class="ol-popup" style="display: none;">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content"></div>
+  </div>
+  <%= hidden_field_tag :geometry, item.geom.present? ? item.geom.as_text : nil %>
+</div>

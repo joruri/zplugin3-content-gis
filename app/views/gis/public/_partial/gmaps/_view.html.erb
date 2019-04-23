@@ -1,0 +1,114 @@
+<%-
+if item.present?
+  default_position = default_map_position(item.content)
+  map_lat  = item.lat.presence || default_position[0]
+  map_lng  = item.lng.presence || default_position[1]
+  map_zoom = item.content.try(:map_default_zoom) || 14
+  api_url = "https://maps.googleapis.com/maps/api/js?key=#{item.site.google_map_api_key}&region=jp"
+  api_url += "&language=en"
+else
+  default_position = default_map_position(@content)
+  map_lat  = default_position[0]
+  map_lng  = default_position[1]
+  if center
+    map_lat  = center[:lat].presence || default_position[0]
+    map_lng  = center[:lng].presence || default_position[1]
+  end
+  map_zoom = 14
+  map_config = {lat: map_lat, lng: map_lng, zoom: map_zoom}
+  api_url = "https://maps.googleapis.com/maps/api/js?key=#{@content.site.google_map_api_key}&region=jp"
+  api_url += "&language=#{@lang}" if translated.present?
+end
+
+-%>
+<%= javascript_include_tag api_url %>
+<script type="text/javascript">
+//<![CDATA[
+function addEvent(element, listener, func) {
+  try {
+    element.addEventListener(listener, func, false);
+  } catch (e) {
+    element.attachEvent('on' + listener, func);
+  }
+}
+
+addEvent(window, 'load', function() {
+  var mapOptions = {
+    center: new google.maps.LatLng(<%= map_lat.to_f %>, <%= map_lng.to_f %>),
+    zoom: <%= map_zoom.to_i %>,
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    scaleControl: true,
+    scrollwheel: true
+  };
+  var map = new google.maps.Map(document.getElementById("contentMap"), mapOptions);
+
+  var points = {};
+  var infowindows = {};
+
+  <%- if item.present? -%>
+  points['<%= item.name %>'] = new google.maps.Marker({
+      position: new google.maps.LatLng(<%= item.lat.to_f %>, <%= item.lng.to_f %>),
+      map: map
+  });
+
+  var icon_uri = "<%= item.icon_uri.present? ? item.icon_uri : '' %>";
+  if ( icon_uri != ''){
+    points['<%= item.name %>'].setIcon(icon_uri);
+  }
+
+  google.maps.event.addListener(points['<%= item.name %>'], 'click', function() {
+    displayFeatureInfo(null, '<%= item.name %>', []);
+  });
+  displayFeatureInfo(null, '<%= item.name %>', []);
+  <% end %>
+
+  <% nearby_markers.each_with_index do |marker, idx| %>
+    points['<%= marker.name %>'] = new google.maps.Marker({
+      position: new google.maps.LatLng(<%= marker.lat.to_f %>, <%= marker.lng.to_f %>),
+        map: map
+      });
+
+    var icon_uri = "<%= marker.icon_uri.present? ? marker.icon_uri : '' %>";
+    if ( icon_uri != ''){
+      points['<%= marker.name %>'].setIcon(icon_uri);
+      }
+
+    google.maps.event.addListener(points['<%= marker.name %>'], 'click', function() {
+      displayFeatureInfo(null, '<%= marker.name %>', []);
+      });
+  <% end %>
+
+  function displayFeatureInfo(coordinate, markerId, nearbyMarkers) {
+    var url = '<%= @node.public_uri %>_ID_'.replace(/_ID_/, markerId) + '/detail';
+    if ( infowindows[markerId] ){
+      infowindows[markerId].open(map, points[markerId]);
+      return;
+    }
+
+    if ( nearbyMarkers.length > 0) {
+      var nearIds = nearbyMarkers.join('&names[]=');
+      url = url + '?names[]=' + nearIds;
+    }
+    $.get(url, function(result) {
+      var dom = $.parseHTML(result);
+      infowindows[markerId] = new google.maps.InfoWindow({
+        content: dom[0].data,
+        disableAutoPan: false
+      });
+      infowindows[markerId].open(map, points[markerId]);
+      return;
+    });
+  }
+
+  $(".displayFeature").on('click',function(){
+    var markerId = $(this).attr('id').replace(/feature/, '');
+    displayFeatureInfo(null, markerId, []);
+    return false;
+  });
+
+});
+
+//]]>
+</script>
+<div id="contentMap" class="gmap"></div>
+

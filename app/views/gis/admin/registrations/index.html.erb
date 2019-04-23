@@ -1,0 +1,30 @@
+<%= render 'search' -%>
+<%= page_entries_info @items -%>
+<table class="index">
+  <tr>
+    <th style="text-align: center; width: 60px;">詳細</th>
+    <th></th>
+    <th style="text-align: center; width: 150px;"><%= Gis::Entry.human_attribute_name :created_at %></th>
+    <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :remote_addr %></th>
+    <th style="text-align: left;"><%= Survey::FormAnswer.human_attribute_name :user_agent %></th>
+    <th style="text-align: center; width: 60px;"><%= Gis::Entry.human_attribute_name :state %></th>
+  </tr>
+  <%- for item in @items -%>
+  <tr class="<%= cycle '', 'cycle' %>">
+    <td style="text-align: center;"><%= link_to :show, gis_registration_path(content: @content, id: item.id) %></td>
+    <td style="text-align: left;">
+      <% if db = item.db %>
+      <%= simple_format entry_title_value(item, item.db, item.files).gsub(/file_contents\//, "#{item.id}/file_contents/") %>
+      <%- else -%>
+      <%= item.title -%>
+      <%- end -%>
+    </td>
+    <td style="text-align: center;"><%=l item.updated_at %></td>
+    <td style="text-align: left;"><%= item.remote_addr %></td>
+    <td style="text-align: left;"><%= item.user_agent %></td>
+    <td style="text-align: center;"><%= item.state_text %></td>
+  </tr>
+  <%- end -%>
+</table>
+
+<%= paginate @items -%>

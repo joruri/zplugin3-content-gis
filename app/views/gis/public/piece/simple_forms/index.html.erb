@@ -1,0 +1,38 @@
+<div id="simpleSearch">
+  <%= form_tag "#{@node.public_uri}", method: :get, class: 'search' do |f| %>
+    <div class="upper_text"><%=raw @piece.upper_text %></div>
+    <%- @titles.each do |i, title| -%>
+    <div class="section">
+      <div class="title"><%= title %></div>
+      <%-
+        recommend_ids = @recommend_ids[i]
+        next if recommend_ids.blank?
+        title_recommends = @recommends.select{|r| recommend_ids.include?(r.id.to_s) }
+        -%>
+      <div class="conditions">
+        <% for item in title_recommends %>
+          <div>
+            <label>
+            <%= check_box_tag "recommend[#{i}][]", item.id, false,
+              id: "recommend_#{i}_#{item.id}",
+              class: "recommend_#{i}_#{item.name}" %>
+            <%- if item.icon_uri.present? -%><%= image_tag(item.icon_uri) %><%- end -%>
+            <span><%= sanitize item.title %></span>
+            </label>
+            <%- if item.body.present? -%><p><%= hbr item.body %></p><%- end -%>
+          </div>
+        <%- end -%>
+      </div>
+      <% if @piece.in_lower_texts[i].present? %>
+      <div class="summary">
+        <%= raw @piece.in_lower_texts[i] %>
+      </div>
+      <%- end -%>
+    </div>
+    <%- end -%>
+    <%- if @piece.lower_text.present? -%>
+    <div class="lower_text"><%=raw @piece.lower_text %></div>
+    <%- end -%>
+    <button type="submit">検索</button>
+  <%- end -%>
+</div>

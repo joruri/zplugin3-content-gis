@@ -1,0 +1,58 @@
+<%= init_ckeditor baseHref: "#{gis_layer_path(content: @content, id: @item.id.to_i)}/" %>
+<span class="note">※は必須項目です。</span>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= f.label :name %></th>
+    <td><%= f.text_field :name, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :sort_no %></th>
+    <td><%= f.text_field :sort_no, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title %></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :body %></th>
+    <td>
+      <%= f.text_area :body %>
+    </td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= f.label :message %></th>
+  </tr>
+  <tr>
+    <td class="cke_editor_wrapper">
+      <%= f.text_area :message, class: 'body ckeditor' %>
+    </td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= f.label :icon_file %></th>
+    <td><%= f.text_field :icon_file %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :tumbnail_file %></th>
+    <td><%= f.text_field :tumbnail_file %></td>
+  </tr>
+</table>
+
+<%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+
+<%= render 'sys/admin/_partial/files/form', f: f, item: @item, content: @content %>
+
+<%= render 'cms/admin/_partial/inquiries/form', f: f, item: @item, content: @content %>
+
+<p class="form">承認フロー</p>
+<%= render 'approval/admin/_partial/form', f: f, item: @item, content: @content %>
+
+<%= editable_group_form f %>
+
+<%= creator_form f %>
+

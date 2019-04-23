@@ -1,0 +1,16 @@
+<table class="show categories">
+  <tr>
+    <th><%= f.label :in_category_ids %></th>
+    <td id="categories">
+      <%-
+        category_ids = @item.in_category_ids
+        category_ids = category_ids.map(&:to_i) if category_ids.present?
+       -%>
+      <%- @content.categories_for_option.each do |c| -%>
+      <label><%= check_box_tag "item[in_category_ids][]", c[1],
+        category_ids.present? ? category_ids.include?(c[1]) : false %>
+        <%= c[0] %></label>
+      <%- end -%>
+    </td>
+  </tr>
+</table>

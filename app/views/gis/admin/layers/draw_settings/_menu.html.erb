@@ -1,0 +1,14 @@
+<h2><%= @layer.try(:title) %>：描画設定</h2>
+
+<div class="actionMenu">
+  <%- case action_name -%>
+  <%- when 'index' -%>
+  <% if @items.blank? %>
+    <%= link_to :new, { action: :new } if Core.user.has_auth?(:designer) && Core.user.has_priv?(:create, item: Core.concept) %>
+  <% else %>
+    <%= link_to :edit,  edit_gis_layer_draw_setting_path(id: @item) %>
+  <% end %>
+  <%- when 'edit' -%>
+    <%= action_menu :index, url_for(action: 'index') %>
+  <%- end -%>
+</div>

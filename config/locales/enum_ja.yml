@@ -1,0 +1,90 @@
+ja:
+  enum_ish:
+    gis/entry:
+      geometry_type:
+        point: 点
+        line: 線
+        polygon: 面
+        circle: 円
+    gis/registration:
+      state:
+        draft: 未処理
+        public: 公開済
+        closed: 非公開
+    gis/layer:
+      state:
+        group: 所属内公開
+        internal: 内部公開
+        public: 公開
+        closed: 非公開
+      geometry_type:
+        point: 点
+        line: 線
+        polygon: 面
+        circle: 円
+      kind:
+        point: ポイントデータ
+        wms: WMS
+        raster: ラスター画像
+        kml: KMLファイル
+        gpx: GPXファイル
+    gis/recommend:
+      operator_type:
+        and: AND検索
+        or: OR検索
+    gis/entry/import:
+      file_type:
+        csv: CSV
+        csv_zip: CSV（zip形式）
+        shape: SHAPEファイル（zip形式）
+        gxml: G-XML
+      srid:
+        4326: 緯度・経度／世界測地系
+        4301: 緯度・経度／日本測地系
+        2443: 平面直角座標第1系
+        2444: 平面直角座標第2系
+        2445: 平面直角座標第3系
+        2446: 平面直角座標第4系
+        2447: 平面直角座標第5系
+        2448: 平面直角座標第6系
+        2449: 平面直角座標第7系
+        2450: 平面直角座標第8系
+        2452: 平面直角座標第9系
+        2453: 平面直角座標第10系
+        2454: 平面直角座標第11系
+        2455: 平面直角座標第12系
+        2456: 平面直角座標第13系
+        2457: 平面直角座標第14系
+        2458: 平面直角座標第15系
+        2459: 平面直角座標第16系
+        2460: 平面直角座標第17系
+        2461: 平面直角座標第18系
+    gis/drawing_setting:
+      geometry_type:
+        point: 点
+        line: 線
+        polygon: 面
+        circle: 円
+      label_position:
+        AUTO: 自動
+        ul: 上揃え-左寄せ
+        uc: 上揃え-中央寄せ
+        ur: 上揃え-右寄せ
+        cl: 中央揃え-左寄せ
+        cc: 中央揃え-中央寄せ
+        cr: 中央揃え-右寄せ
+        ll: 下揃え-左寄せ
+        lc: 下揃え-中央寄せ
+        lr: 下揃え-右寄せ
+      label_size:
+        4: 4
+        5: 5
+        6: 6
+        7: 7
+        8: 8
+        9: 9
+        10: 10
+        11: 11
+        12: 12
+        13: 13
+        14: 14

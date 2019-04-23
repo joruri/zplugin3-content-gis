@@ -1,0 +1,10 @@
+<%= render 'shared/admin/piece/show' do -%>
+<p class="form">詳細設定</p>
+
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :in_recommend_ids %></th>
+    <td><%= @item.recommend_items.pluck(:title).join(",") %></td>
+  </tr>
+</table>
+<%- end -%>

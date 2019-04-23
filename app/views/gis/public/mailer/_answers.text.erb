@@ -1,0 +1,54 @@
+<%- if db = @form_request.db
+  db_items = db.items.public_state
+  db_items.each do |item|
+    title = item.title
+    description = ""
+    case item.item_type
+    when 'office_hours'
+      val = []
+      Webdb::Entry::WEEKDAY_OPTIONS.each_with_index do |w, i|
+        val << @form_request.item_values.dig(item.name, 'open', i.to_s)
+        val << @form_request.item_values.dig(item.name, 'close', i.to_s)
+        val << @form_request.item_values.dig(item.name, 'open2', i.to_s)
+        val << @form_request.item_values.dig(item.name, 'close2', i.to_s)
+      end
+      description = val.join("，")
+    when 'ampm', 'blank_weekday'
+      description = @form_request.item_values.dig(item.name, 'text')
+    when 'check_data'
+      val = []
+      checks = @form_request.item_values.dig(item.name, 'check')
+      select_data = item.item_options_for_select_data
+      if select_data.present? && checks.present?
+        select_data.each{|e| val << e[0] if checks.include?(e[1].to_s) }
+      end
+      description = val.join("，")
+    when 'check_box'
+      val = []
+      checks = @form_request.item_values.dig(item.name, 'check')
+      select_data = item.item_options_for_select
+      if select_data.present? && checks.present?
+        select_data.each{|e| val << e[0] if checks.include?(e[1]) }
+      end
+      description = val.join("，")
+    when 'select_data', 'radio_data'
+      val = ""
+      if select_data = item.item_options_for_select_data
+        select_data.each{|e| val = e[0] if e[1] == @form_request.item_values[item.name].to_i }
+      end
+      description = val
+    else
+      description = @form_request.item_values[item.name]
+    end%>
+■<%= title %>
+<%= description %>
+  <%- end -%>
+
+
+<%- else -%>
+■<%= @form_request.title %>
+<%= @form_request.description %>
+<%- end %>
+■位置情報
+<%= @form_request.lat %>, <%= @form_request.lng %>
+

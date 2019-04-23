@@ -1,0 +1,69 @@
+<%= init_ckeditor baseHref: "#{gis_layer_path(content: @content, id: @item.id.to_i)}/" %>
+<span class="note">※は必須項目です。</span>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= f.label :state %></th>
+    <td><%= f.collection_radio_buttons :state, @item.class.state_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :name %></th>
+    <td><%= f.text_field :name, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title %></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  <tr>
+    <th><%= f.label :kind %></th>
+    <td><%= f.collection_radio_buttons :kind, @item.class.kind_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :opacity %></th>
+    <td><%= f.select :opacity, options_for_select(@item.class::OPACITY_OPTIONS, @item.opacity) %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :export_config%></th>
+    <td>
+      <%= f.check_box :use_export_csv %><%= f.label :use_export_csv %><br />
+      <%= f.check_box :use_export_kml %><%= f.label :use_export_kml %><br />
+      <%= f.check_box :use_export_kml_no_label %><%= f.label :use_export_kml_no_label %><br />
+    </td>
+  </tr>
+  <tr>
+    <th><%= f.label :use_slideshow %></th>
+    <td>
+      <%= f.check_box :use_slideshow %><%= f.label :enable_slideshow %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= f.label :srid %></th>
+    <td><%= f.select :srid, options_for_select(@item.class::SRID_OPTIONS, @item.srid), include_blank: true %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :geometry_type %></th>
+    <td><%= f.collection_radio_buttons :geometry_type, @item.class.geometry_type_options, :last, :first %></td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= f.label :body %></th>
+  </tr>
+  <tr>
+    <td class="cke_editor_wrapper">
+      <%= f.text_area :body, class: 'body ckeditor' %>
+    </td>
+  </tr>
+</table>
+
+<%= render 'sys/admin/_partial/files/form', f: f, item: @item, content: @content %>
+
+<p class="form">抽出条件</p>
+
+<%= render 'gis/admin/shared/form_search', f: f, item: @item, content: @content %>
+
+<%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+
+<%= editable_group_form f %>
+<br />
+<%= creator_form f %>

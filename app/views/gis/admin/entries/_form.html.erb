@@ -1,0 +1,51 @@
+<%= init_ckeditor baseHref: "#{gis_entries_path(content: @content, id: @item.id.to_i)}/" %>
+<script type="text/javascript">
+$(function() {
+  $('#tabs').tabs({
+    active: ($('#tabs > ul > li').length - 1)
+  });
+  $('#tabs .ui-tabs-nav > li').css('float', 'right');
+  $('#tabs').show();
+});
+</script>
+<div id="tabs" class="tabs" style="display: none;">
+  <ul>
+    <li><a href="#tab3">オプション</a></li>
+    <li style="<%= 'display: none;' unless @content.approval_related? %>"><a href="#tab2">承認フロー</a></li>
+    <li><a href="#tab1">基本情報</a></li>
+  </ul>
+
+  <div id="tab1">
+
+    <p class="form">詳細情報</p>
+    <%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+    <%= render 'gis/admin/shared/form_database', f: f, item: @item, content: @content %>
+
+    <table class="show" id="normal_body_form" style="<%= 'display:none;' if @item.db %>">
+      <tr>
+        <th><%= f.label :title %> <span class="note">※</span></th>
+        <td><%= f.text_field :title, class: 'name' %></td>
+      </tr>
+      <tr>
+        <th><%= f.label :summary %> <span class="note">※</span></th>
+        <td><%= f.text_area :summary %></td>
+      </tr>
+      <tr>
+        <th colspan="2"><%= f.label :description %> <span class="note">※</span></th>
+      </tr>
+      <tr>
+        <td colspan="2"><%= f.text_area :description, class: 'body ckeditor' %></td>
+      </tr>
+    </table>
+    <%= render 'sys/admin/_partial/files/form', f: f, item: @item, content: @content %>
+    <p class="form">位置情報</p>
+    <%= gis_map_form f %>
+  </div>
+  <div id="tab2">
+  <%= render 'approval/admin/_partial/form', f: f, item: @item, content: @content %>
+  </div>
+  <div id="tab3">
+    <%= editable_group_form f %>
+    <%= creator_form f %>
+  </div>
+</div>

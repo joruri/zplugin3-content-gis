@@ -1,0 +1,10 @@
+<%= render 'shared/admin/piece/form', f: f do -%>
+<p class="form">詳細設定</p>
+
+<table class="show">
+  <tr>
+    <th><%= f.label :in_recommend_ids %></th>
+    <td><%= f.collection_check_boxes :in_recommend_ids, @item.content.recommends_for_option, :last, :first %></td>
+  </tr>
+</table>
+<%- end -%>

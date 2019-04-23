@@ -1,0 +1,59 @@
+<%= init_ckeditor readOnly: true %>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :state %></th>
+    <td><%= @item.state_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :name %></th>
+    <td><%= @item.name %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :sort_no %></th>
+    <td><%= @item.sort_no %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :body %></th>
+    <td><%= hbr @item.body %></td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :message %></th>
+  </tr>
+  <tr>
+    <td colspan="2" class="cke_editor_wrapper">
+      <%= text_area_tag "body",
+        @item.message.to_s.gsub(/file_contents\//, "#{@item.id}/file_contents/"),
+        class: 'ckeditor' %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :icon_file %></th>
+    <td><%= hbr @item.icon_file %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :tumbnail_file %></th>
+    <td><%= hbr @item.tumbnail_file %></td>
+  </tr>
+</table>
+
+<%= render 'gis/admin/_partial/categories/view', item: @item%>
+
+
+<%= render 'sys/admin/_partial/files/view', item: @item, content: @content %>
+
+<p class="form">フォルダ・レイヤー設定</p>
+
+<%= render 'cms/admin/_partial/inquiries/view', item: @item, content: @content %>
+
+
+<%= editable_group_view @item %>
+
+<%= creator_view @item %>

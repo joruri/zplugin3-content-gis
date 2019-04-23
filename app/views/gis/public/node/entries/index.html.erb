@@ -1,0 +1,77 @@
+<div id="contentGisIndex">
+  <div class="leftMenu" id="resultMenu">
+    <%= form_tag "#{@node.public_uri}", method: :get, class: 'keywordSearch' do |f| %>
+      <%= text_field_tag "keyword", '', placeholder: '施設名・住所・電話番号など' %>
+      <%= hidden_field_tag 'target', @target_db.try(:id) %>
+      <button type="submit">検索</button>
+    <%- end -%>
+    <ul class="tabs">
+      <li><%= link_to (Gis::Entry.human_attribute_name :results), "#markers", class: "showListTab active"%></li>
+      <li><%= link_to "検索条件", "#conditions", class: "showListTab"%></li>
+    </ul>
+    <div id="markers" class="tabContent">
+      <%= page_entries_info @items -%>
+      <%-
+        center = {}
+        @items.each_with_index do |item, i|
+        center[:lat] = item.lat if i == 0
+        center[:lng] = item.lng if i == 0
+      -%>
+      <div class="resultContent">
+        <div class="marker-info">
+          <div class="map-link">
+            <%= link_to item.title, "#{item.public_uri}", class: "displayFeature", id: "feature#{item.name}",
+                        'data-coordinates': {lat: item.lat, lng: item.lng}.to_json %>
+          </div>
+          <div class="information">
+          <%= sanitize item.summary %>
+          </div>
+        </div>
+     </div>
+    <%- end -%>
+    <%= public_paginate @items %>
+    </div>
+    <div id="conditions" class="tabContent" style="display: none;">
+      <span class="title">検索条件</span>
+      <%= sanitize search_conditions(@content, params[:target]) %>
+      <span class="title">リンク用URL</span>
+      <%= text_area_tag :link_url, nil%>
+    </div>
+  </div>
+
+
+  <% if @translated %>
+  <%= gmap_view(nil, nearby_markers: @markers, translated: @translated, center: center) %>
+  <% elsif @content.site.map_source == 'google' %>
+  <%= gmap_view(nil, nearby_markers: @markers, translated: nil, center: center) %>
+  <% else %>
+  <%= gis_public_map_view(nil, nearby_markers: @markers, center: center) %>
+  <% end %>
+<script type="text/javascript">
+//<![CDATA[
+
+$(function() {
+
+  $(".showListTab").on("click",function(){
+    var $th = $(this).index();
+    $(".showListTab").removeClass("active");
+    $(this).addClass("active");
+    var id = $(this).attr("href");
+    $(".tabContent").hide();
+    $(id).show();
+    return false;
+  });
+
+  function setUrl(){
+    var url = location.href ;
+    $("#link_url").val(url);
+  }
+  setUrl();
+
+
+});
+
+//]]>
+</script>
+
+</div>

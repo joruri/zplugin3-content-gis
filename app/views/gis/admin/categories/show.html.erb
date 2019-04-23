@@ -1,0 +1,27 @@
+<p class="form">基本情報</p>
+
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :state %></th>
+    <td><%= @item.state_text %></td>
+  </tr>
+  <tr>
+    <th>ID</th>
+    <td><%= @item.name %></td>
+  </tr>
+  <tr>
+    <th>名称</th>
+    <td><%= @item.title %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :sort_no %></th>
+    <td><%= @item.sort_no %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :icon_uri %></th>
+    <td><%= @item.icon_uri %></td>
+  </tr>
+</table>
+
+
+<%= creator_view @item %>

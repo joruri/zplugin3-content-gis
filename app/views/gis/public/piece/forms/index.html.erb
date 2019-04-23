@@ -1,0 +1,28 @@
+<div class="contentGis">
+  <%= form_tag "#{@node.public_uri}", method: :get, class: 'search' do |f| %>
+    <%= hidden_field_tag 'target', @db.id %>
+    <%= hidden_field_tag 'sort', @db.items.target_sort_state.first.try(:name) %>
+    <div class="search_keyword">
+        <div class="title">キーワード</div>
+        <div class="conditions">
+          <div>
+            <%= text_field_tag "keyword", '', placeholder: '施設名・住所・電話番号など' %>
+          </div>
+        </div>
+    </div>
+    <%= render 'gis/public/_partial/categories/form' %>
+    <%= render 'webdb/public/shared/form', db: @db, items: @items %>
+
+  <div class="submitters">
+    <button type="submit">検索</button>
+  </div>
+<%- end -%>
+<%= javascript_tag do %>
+$(function() {
+  $('input.datepicker').datepicker();
+});
+<%- end -%>
+
+
+</div>
+

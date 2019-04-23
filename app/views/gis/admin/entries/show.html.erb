@@ -1,0 +1,56 @@
+<%= init_ckeditor readOnly: true %>
+<script type="text/javascript">
+$(function() {
+  $('#tabs').tabs({
+    active: ($('#tabs > ul > li').length - 1)
+  });
+  $('#tabs .ui-tabs-nav > li').css('float', 'right');
+  $('#tabs').show();
+});
+</script>
+<div id="tabs" class="tabs" style="display: none;">
+  <ul>
+    <li><a href="#tab3">オプション</a></li>
+    <li style="<%= 'display: none;' unless @content.approval_related? %>"><a href="#tab2">承認フロー</a></li>
+    <li><a href="#tab1">基本情報</a></li>
+  </ul>
+
+  <div id="tab1">
+    <p class="form">詳細情報</p>
+    <%= render 'gis/admin/_partial/categories/view', item: @item%>
+    <%- if @item.db -%>
+    <%= render 'webdb/admin/shared/show', db: @item.db, item_values: @item.item_values,
+      files: @item.files,  file_uri: @item.file_content_uri %>
+    <%- else -%>
+    <table class="show">
+      <tr>
+        <th><%= @item.class.human_attribute_name :title %></th>
+        <td><%= @item.title %></td>
+      </tr>
+      <tr>
+        <th><%= @item.class.human_attribute_name :summary %></th>
+        <td><%= hbr @item.summary %></td>
+      </tr>
+      <tr colspan="2">
+        <th><%= @item.class.human_attribute_name :description %></th>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <%= text_area_tag :description, replace_file_path(@item.description, base: @item.file_base_uri), class: 'ckeditor' %>
+        </td>
+      </tr>
+    </table>
+    <%- end -%>
+    <%= render 'sys/admin/_partial/files/view', item: @item, content: @content %>
+    <p class="form">位置情報</p>
+    <%= gis_map_view @item %>
+  </div>
+  <div id="tab2">
+    <%= render 'approval/admin/_partial/view', item: @item, content: @content %>
+  </div>
+  <div id="tab3">
+    <%= editable_group_view @item %>
+
+    <%= creator_view @item %>
+  </div>
+</div>

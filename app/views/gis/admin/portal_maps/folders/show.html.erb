@@ -1,0 +1,49 @@
+<%= init_ckeditor readOnly: true %>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :state %></th>
+    <td><%= @item.state_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :sort_no %></th>
+    <td><%= @item.sort_no %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :body %></th>
+    <td><%= hbr @item.body %></td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :message %></th>
+  </tr>
+  <tr>
+    <td colspan="2" class="cke_editor_wrapper">
+      <%= text_area_tag "body",
+        @item.message.to_s.gsub(/file_contents\//, "#{@item.id}/file_contents/"),
+        class: 'ckeditor' %>
+    </td>
+  </tr>
+</table>
+
+<p class="form">レイヤー</p>
+<table id="layerForm" class="show layerForm">
+  <tbody id="layerFormTbody">
+  <%- @item.folder_layers.each_with_index do |layer, i| -%>
+      <tr>
+        <th class="name">レイヤー</th>
+        <td class="name"><%= layer.layer.try(:title) %></td>
+        <th class="point">並び順</th>
+        <td class="point"><%= layer.sort_no %></td>
+      </tr>
+  <%- end -%>
+  </tbody>
+</table>
+
+<%= creator_view @item %>

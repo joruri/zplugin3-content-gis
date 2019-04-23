@@ -1,0 +1,10 @@
+<div id="gisContent">
+  <%= render 'gis/public/_partial/registrations/view' %>
+
+  <%= form_for @item, as: :item, url: "#{@node.public_uri}submit", html: { method: :post, multipart: true } do |f| %>
+    <%= render 'gis/public/_partial/registrations/field', f: f %>
+    <%= f.submit '登録申請する' %>
+    <%= f.submit '内容を修正する', name: :edit_answers %>
+  <%- end -%>
+
+</div>

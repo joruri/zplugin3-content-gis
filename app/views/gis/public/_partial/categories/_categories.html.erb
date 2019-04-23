@@ -1,0 +1,16 @@
+<%- categories.each do |category| -%>
+<div class="level<%= category.level_no -%>">
+  <div class="<%= category.name -%>">
+  <label>
+  <%= check_box_tag "category_ids[]", category.id,
+    params[:category_ids] ? params[:category_ids].index(category.id).present? : false,
+    id: "categories_#{category.name}" %>
+    <%= category.title %></label>
+  <%- category.public_children.each do |child| -%>
+    <%- unless child.public_children.empty? -%>
+    <%= render 'categories', categories: category.public_children %>
+    <%- end -%>
+  </div>
+  <%- end -%>
+</div>
+<%- end -%>

@@ -1,0 +1,30 @@
+<%-
+category_options = @content.categories_for_option
+category_ids = params.dig(:criteria, :category_ids) || []
+-%>
+
+<%= form_tag url_for(action: :index), method: :get, class: 'search' do -%>
+<%= hidden_field_tag :detail_flag, params[:detail_flag] %>
+<%= hidden_field_tag :target_state, params[:target_state] %>
+<%= hidden_field_tag 'criteria[db_id]', @registration_db.try(:id)%>
+<table>
+  <tr>
+    <th>タイトル・内容・ディレクトリ名など</th>
+    <th>カテゴリ</th>
+    <th>表示件数</th>
+    <td rowspan="2" class="submitters">
+      <%= submit_tag '検索', data: { disable_with: false } %>
+      <%= submit_tag 'リセット', name: 'reset_criteria', data: { disable_with: false } %>
+      <%= submit_tag 'CSV',  name: 'csv', data: { disable_with: false } %>
+    </td>
+  </tr>
+  <tr>
+    <td><%= text_field_tag 'criteria[free_word]', params.dig(:criteria, :free_word), style: 'width: 280px;' %></td>
+    <td>
+      <%= select_tag 'criteria[category_ids][]', options_for_select(category_options, category_ids[0]),
+            include_blank: true, id: "criteria_category_ids_0" %>
+    </td>
+    <td><%= select_tag 'limit', options_for_select(@content.class::LIMIT_OPTIONS, params[:limit].to_i) %></td>
+  </tr>
+</table>
+<%- end -%>

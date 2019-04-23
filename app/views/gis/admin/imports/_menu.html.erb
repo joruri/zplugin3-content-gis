@@ -1,0 +1,10 @@
+<h2><%= menu_header @content.name, Gis::Entry.model_name.human %></h2>
+<div class="actionMenu">
+  <%= link_to '一覧表示', gis_entries_path %>
+  <%= link_to '地図表示', gis_entries_path(maps: true) %>
+  <span class="separator"></span>
+  <%= link_to :new, new_gis_entry_path if Core.user.has_priv?(:create, item: Core.concept) %>
+  <span class="separator"></span>
+  <%= link_to 'エクスポート', gis_exports_path %>
+  <%= link_to 'インポート', gis_imports_path %>
+</div>

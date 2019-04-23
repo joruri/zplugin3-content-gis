@@ -1,0 +1,31 @@
+<%= init_ckeditor baseHref: @node.public_uri %>
+
+<h2>詳細情報</h2>
+<%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+
+<%= f.hidden_field :db_id %>
+
+<%- if @registration_db -%>
+<%= render 'webdb/admin/shared/form', db: @registration_db,
+  item_values: @item.item_values, use_admin: false, skip_fields: @content.form_skip_fields %>
+  <%- @content.form_default_value.each do |key, val| -%>
+  <%= hidden_field_tag "item[item_values][#{key}]", val %>
+  <%- end -%>
+<%- else -%>
+  <table class="show information" id="normal_body_form" style="<%= 'display:none;' if @item.db %>">
+    <tr>
+      <th><%= f.label :title %> <span class="note">※</span></th>
+      <td><%= f.text_field :title, class: 'name' %></td>
+    </tr>
+  </table>
+<%- end -%>
+
+<h2>位置情報</h2>
+<%= gis_map_form f %>
+
+<%- if @content.use_captcha? -%>
+<div class="question">
+  <div class="question_content">画像認証</div>
+  <div class="answer_content"><%= show_simple_captcha %></div>
+</div>
+<%- end -%>

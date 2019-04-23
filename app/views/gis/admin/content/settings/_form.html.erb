@@ -1,0 +1,237 @@
+<%= render 'shared/admin/content/settings/form', f: f, item: @item -%>
+<%- if @item.name == 'map_lat_lng' %>
+<table class="show">
+  <tr>
+    <th>縮尺</th>
+    <td><%= select_tag 'item[extra_values][zoom]', options_for_select(@item.extra_options[:zoom], @item.extra_values[:zoom]), include_blank: true %></td>
+  </tr>
+</table>
+<%- end -%>
+<%- if @item.name == 'inquiry_setting' -%>
+<table class="show">
+  <tr>
+    <th>表示初期値</th>
+    <td><%= select_tag 'item[extra_values][state]', options_for_select(@item.extra_options[:default_state_options], @item.extra_values[:state]), include_blank: true %></td>
+  </tr>
+  <tr>
+    <th>表示タイトル</th>
+    <td><%= text_field_tag 'item[extra_values][inquiry_title]', @item.extra_values[:inquiry_title], style: 'width: 400px;' %></td>
+  </tr>
+  <tr>
+    <th>表示形式</th>
+    <td>
+      <%= link_to '置き換えテキストを確認する', '#', id: 'show_inquiry_dialog' %><br />
+      <%= text_area_tag 'item[extra_values][inquiry_style]', @item.extra_values[:inquiry_style], size: '100x10' %>
+    </td>
+  </tr>
+</table>
+<%= render 'cms/admin/_partial/inquiries/style_tags' %>
+<%= javascript_tag do %>
+$(function() {
+  $('#show_inquiry_dialog').on('click', function() {
+    $('#inquiry_style_tags').dialog({width: 400});
+    return false;
+  });
+});
+<% end %>
+<%- end -%>
+<%- if @item.name == 'approval_relation' -%>
+<table class="show">
+  <tr>
+    <th>コンテンツ</th>
+    <td><%= select_tag 'item[extra_values][approval_content_id]',
+                       options_from_collection_for_select(Approval::Content::ApprovalFlow.where(site_id: Core.site.id), :id, :name, @item.extra_values[:approval_content_id]), include_blank: true %></td>
+  </tr>
+  <tr>
+    <th>承認後公開</th>
+    <td>
+      <%= radio_button_tag 'item[extra_values][publish_after_approved]', 'enabled', @item.extra_values[:publish_after_approved] == 'enabled' %>
+      <%= label_tag 'item_extra_values_publish_after_approved_enabled', '使用する' %>
+      <%= radio_button_tag 'item[extra_values][publish_after_approved]', 'disabled', @item.extra_values[:publish_after_approved] == 'disabled' %>
+      <%= label_tag 'item_extra_values_publish_after_approved_disabled', '使用しない' %>
+    </td>
+  </tr>
+</table>
+<%- end -%>
+
+
+<%- if @item.name == 'webdb_content_db_id'
+      content = Webdb::Content::Db.find_by_id(@item.value)
+      databases = content ? content.dbs.public_state : []
+      database_ids = @item.extra_values[:db_ids] || []
+      databases_for_option = content ? content.dbs.map {|t| [t.title, t.id] } : []
+    -%>
+<table class="show">
+  <tr>
+    <th>利用<%= Webdb::Db.model_name.human %></th>
+    <td id="databases">
+      <%- databases.each do |d| -%>
+      <span class="database">
+      <%= check_box_tag "database_#{d.id}", d.id, database_ids.include?(d.id), name: 'item[extra_values][db_ids][]' -%> <%= label_tag "database_#{d.id}", d.title -%>
+      </span>
+      <%- end -%>
+    </td>
+  </tr>
+  <tr>
+    <th>マーカー表示形式</th>
+    <td>
+      <%= text_area_tag 'item[extra_values][window_text]', @item.extra_values[:window_text], size: '100x10' %>
+    </td>
+  </tr>
+  <tr>
+    <th>ジオコーディング用アイテムID</th>
+    <td>
+      <%= text_field_tag 'item[extra_values][geocoding_column]', @item.extra_values[:geocoding_column] %>
+    </td>
+  </tr>
+</table>
+
+<br />
+<p class="form">初期値</p>
+
+<table class="show">
+  <tr>
+    <th>初期設定<%= Webdb::Db.model_name.human %></th>
+    <td><%= select_tag 'item[extra_values][default_db_id]', options_for_select(databases_for_option, @item.extra_values[:default_db_id]), include_blank: true %></td>
+  </tr>
+  <tr>
+    <th>登録申請<%= Webdb::Db.model_name.human %></th>
+    <td><%= select_tag 'item[extra_values][registration_db_id]', options_for_select(databases_for_option, @item.extra_values[:registration_db_id]), include_blank: true %></td>
+  </tr>
+  <tr>
+    <th>登録申請既定値</th>
+    <td>
+      <table class="show" id="table_field">
+        <tr>
+          <th>アイテムID</th>
+          <th>初期値</th>
+        </tr>
+        <%- @item.default_values.each_with_index do |l, i| -%>
+          <tr class="table_row">
+            <td><%= text_field_tag "item[extra_values][default_value][][name]", l[:name], style: 'width: 300px;' %></td>
+            <td><%= text_field_tag "item[extra_values][default_value][][data]", l[:data]  , style: 'width: 300px;' %></td>
+            <td class="del"><%= link_to '削除', '#', class: 'remove_row' if i != 0 %></td>
+          </tr>
+        <%- end -%>
+      </table>
+      <div style="margin: 10px;"><%= button_tag '追加', type: 'button', id: 'add_row' %></div>
+    </td>
+  </tr>
+  <tr>
+    <th>変更申請時リセット項目</th>
+    <td><%= text_field_tag 'item[extra_values][blank_value]', @item.extra_values[:blank_value], style: 'width: 600px;' %></td>
+  </tr>
+</table>
+
+<%= javascript_tag do -%>
+$(document).ready(function () {
+  $('#item_value').on('change', function (event) {
+    var content_id = parseInt(event.target.value);
+    if (isNaN(content_id)) {
+      $('#databases').html('');
+      $('#item_extra_values_registration_db_id').html('<option value=""></option>');
+    } else {
+      $('#databases').html('更新中...');
+      $('#item_extra_values_registration_db_id').html('<option value="">更新中...</option>');
+      $.get('<%= webdb_dbs_path(content: 'CONTENT_ID') %>?check_boxes=true'.replace('CONTENT_ID', content_id), function (data) {
+        $('#databases').html(data);
+      });
+      $.get('<%= webdb_dbs_path(content: 'CONTENT_ID') %>?options=true'.replace('CONTENT_ID', content_id), function (data) {
+        $('#item_extra_values_default_db_id').html(data);
+        $('#item_extra_values_registration_db_id').html(data);
+      });
+    }
+  });
+  $('#add_row').addFields({
+    container: '#table_field',
+    fields: '.table_row'
+  });
+});
+<%- end -%>
+<%- end -%>
+
+<%- if @item.name == 'mapserver_relation' -%>
+<table class="show">
+  <tr>
+    <th>マップサーバーURL</th>
+    <td><%= text_field_tag 'item[extra_values][url]', @item.extra_values[:url], style: 'width: 400px;' %></td>
+  </tr>
+</table>
+<%- end -%>
+
+<%- if @item.name == 'auto_reply' -%>
+<table class="show">
+  <tr>
+    <th>自動返信テキスト（上部）</th>
+    <td><%= text_area_tag 'item[extra_values][upper_reply_text]', @item.extra_values[:upper_reply_text], size: '100x10' %></td>
+  </tr>
+  <tr>
+    <th>自動返信テキスト（下部）</th>
+    <td><%= text_area_tag 'item[extra_values][lower_reply_text]', @item.extra_values[:lower_reply_text], size: '100x10' %></td>
+  </tr>
+</table>
+<%- end -%>
+
+<%- if @item.name == 'basic_setting'
+      layouts = Cms::Layout.where(site_id: Core.site.id).order(:concept_id, :name)
+      layouts_for_option = layouts.collect{|i| ["#{i.concept.name} : #{i.title}", i.id]}
+    -%>
+<table class="show">
+  <tr>
+    <th>詳細レイアウト</th>
+    <td>
+      <%= select_tag 'item[extra_values][default_layout_id]', options_for_select(layouts_for_option, @item.default_layout_id), include_blank: true %>
+      <div style="margin: 5px; line-height: 1.2;"><%= @item.lower_text %></div>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+$(function() {
+  $('#item_value').on('change', function(e) {
+    var concept_id = parseInt(e.target.value);
+    var layout = $('#item_extra_values_default_layout_id');
+    if (isNaN(concept_id)) {
+      layout.html('<option value=""></option>');
+    } else {
+      layout.html('<option value="">更新中...</option>');
+      $.get('<%= layouts_cms_concepts_path(parent: 0, concept_id: 'CONCEPT_ID') %>'.replace('CONCEPT_ID', concept_id), function(data) {
+        layout.html(data);
+      });
+    }
+  });
+});
+</script>
+<%- end -%>
+
+<%- if @item.name == 'portal_basic_setting'
+      layouts = Cms::Layout.where(site_id: Core.site.id).order(:concept_id, :name)
+      layouts_for_option = layouts.collect{|i| ["#{i.concept.name} : #{i.title}", i.id]}
+    -%>
+<table class="show">
+  <tr>
+    <th>個別地図レイアウト</th>
+    <td>
+      <%= select_tag 'item[extra_values][default_portal_layout_id]', options_for_select(layouts_for_option, @item.default_portal_layout_id), include_blank: true %>
+      <div style="margin: 5px; line-height: 1.2;"><%= @item.lower_text %></div>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+$(function() {
+  $('#item_value').on('change', function(e) {
+    var concept_id = parseInt(e.target.value);
+    var layout = $('#item_extra_values_default_layout_id');
+    if (isNaN(concept_id)) {
+      layout.html('<option value=""></option>');
+    } else {
+      layout.html('<option value="">更新中...</option>');
+      $.get('<%= layouts_cms_concepts_path(parent: 0, concept_id: 'CONCEPT_ID') %>'.replace('CONCEPT_ID', concept_id), function(data) {
+        layout.html(data);
+      });
+    }
+  });
+});
+</script>
+<%- end -%>

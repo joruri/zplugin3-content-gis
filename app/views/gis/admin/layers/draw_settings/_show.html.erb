@@ -1,0 +1,94 @@
+<%= action_menu :edit if @item.try(:editable?) %>
+<h2><%=@item.class.human_attribute_name(:base)%></h2>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name(:geometry_type) %></th>
+    <td><%= @item.geometry_type_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name(:label_column) %></th>
+    <td><%#= @item.label_column_show %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name(:label_color) %></th>
+    <td><span style="color: <%=@item.label_color%>">■</span></td>
+  </tr>
+  <tr id="labelPosition">
+    <th><%= @item.class.human_attribute_name(:label_position) %></th>
+    <td><%= @item.label_position_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name(:label_size) %></th>
+    <td><%=@item.label_size_text%></td>
+  </tr>
+</table>
+
+<h2><%=@item.class.human_attribute_name(:draw)%></h2>
+<table class="show">
+  <tr id="point">
+    <th><%= @item.class.human_attribute_name(:point_color) %></th>
+    <td>
+      <%if @item.point_fill == 0%>
+      <span style="color: <%=@item.point_color%>">■</span>
+      <%else%>
+      <span>表示しない</span>
+      <%end%>
+    </td>
+  </tr>
+  <tr id="line1">
+    <th><%= @item.class.human_attribute_name(:line_color) %></th>
+    <td>
+      <%if @item.line_fill == 0%>
+      <span style="color: <%=@item.line_color%>">■</span>
+      <%else%>
+      <span>表示しない</span>
+      <%end%>
+    </td></td>
+  </tr>
+  <tr id="line2">
+    <th><%= @item.class.human_attribute_name(:line_width) %></th>
+    <td><%=@item.line_width_text%></td>
+  </tr>
+  <tr id="polygon">
+    <th><%= @item.class.human_attribute_name(:polygon_color) %></th>
+    <td>
+      <%if @item.polygon_fill == 0%>
+      <span style="color: <%=@item.polygon_color%>">■</span>
+      <%else%>
+      <span>表示しない</span>
+      <%end%>
+    </td></td>
+  </tr>
+</table>
+<script type="text/javascript">
+//<![CDATA[
+(function($) {
+  $(document).ready(function() {
+    drawConfigShow()
+    function drawConfigShow(){
+      var kind = "<%=@item.geometry_type%>";
+      if (kind == "point"){
+        $("#point").show();
+        $("#line1").hide();
+        $("#line2").hide();
+        $("#polygon").hide();
+        $("#labelPosition").show();
+      }else if (kind == "line"){
+        $("#point").hide();
+        $("#line1").show();
+        $("#line2").show();
+        $("#polygon").hide();
+        $("#labelPosition").hide();
+      }else{
+        $("#point").hide();
+        $("#line1").show();
+        $("#line2").show();
+        $("#polygon").show();
+        $("#labelPosition").hide();
+      }
+    }
+
+  });
+})(jQuery);
+//]]>
+</script>

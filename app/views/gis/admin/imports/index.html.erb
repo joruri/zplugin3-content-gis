@@ -1,0 +1,61 @@
+<p class="form">データをインポート</p>
+<%= form_for(:item, :url => {:action => :create}, :html => {:method => :post, :multipart => true}) do |f| %>
+<%= hidden_field_tag :do, 'import' %>
+<table class="show">
+  <tr>
+    <th>ファイル種別</th>
+    <td><%= f.collection_radio_buttons :file_type, @item.class.file_type_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th>ファイル</th>
+    <td><%= f.file_field :file %></td>
+  </tr>
+<%- if @content.form_db_available? -%>
+  <%- if @content.form_dbs.size == 1 && @item.db -%>
+    <%= f.hidden_field :db_id %>
+  <%- else -%>
+      <tr>
+        <th>データベース</th>
+        <td><%= f.select :db_id, @content.form_dbs.map {|t| [t.title, t.id] }, include_blank: true %></td>
+      </tr>
+  <%- end -%>
+<%- end -%>
+  <tr id="sridTr">
+    <th>座標系</th>
+    <td><%= f.select :srid, options_for_select(@item.class.srid_options, nil) %></td>
+  </tr>
+  <tr class="gmlTr">
+    <th>アイテムID</th>
+    <td><%= text_field_tag :item_id, params[:item_id] %></td>
+  </tr>
+</table>
+
+<div class="submitter">
+  <%= submit 'インポート' %>
+</div>
+
+<% end %>
+
+<script type="text/javascript">
+$(function() {
+
+  $('input[name="item[file_type]"]').on('change', function() {
+    var value = $(this).val();
+    if (value == 'shape') {
+      $("#sridTr").show();
+      $(".gmlTr").hide();
+    } else if (value == 'gxml') {
+      $(".gmlTr").show();
+      $("#sridTr").hide();
+      $("#item_srid").val(4326);
+    } else {
+      $("#sridTr").hide();
+      $(".gmlTr").hide();
+      $("#item_srid").val(4326);
+    }
+  });
+
+  $("#sridTr").hide();
+
+});
+</script>

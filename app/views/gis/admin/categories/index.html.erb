@@ -1,0 +1,26 @@
+<%= page_entries_info @items -%>
+
+<table class="index">
+  <tr>
+    <th class="action_link">詳細</th>
+    <th>ID</th>
+    <th>名称</th>
+    <th style="text-align: center; width: 80px;"><%= Gis::Category.human_attribute_name :sort_no %></th>
+    <th style="text-align: center; width: 120px;"><%= Gis::Category.human_attribute_name :updated_at %></th>
+    <th style="text-align: center; width: 60px;"><%= Gis::Category.human_attribute_name :state %></th>
+  </tr>
+
+  <% @items.each do |item| %>
+  <tr class="<%= cycle '', 'cycle' %>">
+    <td class="action_link"><%= link_to :show, { action: :show, category_id: @parent_category.try(:id).to_i,
+                                                            id: item } %></td>
+    <td><%= item.name %></td>
+    <td><%= link_to item.title, { action: :index, category_id: item.id } %></td>
+    <td style="text-align: right;"><%= item.sort_no %></td>
+    <td style="text-align: center;"><%=l item.updated_at %></td>
+    <td style="text-align: center;"><%= item.state_text %></td>
+  </tr>
+  <% end %>
+</table>
+
+<%= paginate @items %>

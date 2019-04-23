@@ -1,0 +1,217 @@
+<%= javascript_include_tag '/_common/js/openlayers/ol.js' %>
+<%= javascript_include_tag '/_common/modules/map/js/openlayers.js' %>
+
+<%-
+if item.present?
+  default_position = default_map_position(item.content)
+  map_lat  = item.lat.presence || default_position[0]
+  map_lng  = item.lng.presence || default_position[1]
+  map_zoom = item.content.try(:map_default_zoom) || 14
+else
+  default_position = default_map_position(@content)
+  map_lat  = default_position[0]
+  map_lng  = default_position[1]
+  if center
+    map_lat  = center[:lat].presence || default_position[0]
+    map_lng  = center[:lng].presence || default_position[1]
+  end
+  map_zoom = 14
+  map_config = {lat: map_lat, lng: map_lng, zoom: map_zoom}
+end
+-%>
+<script type="application/json" id="json-data">
+  <%= sanitize(nearby_markers.to_json) %>
+</script>
+<script type="text/javascript">
+//<![CDATA[
+
+$(function() {
+  var map_source = '<%= @content.site.map_source %>';
+  var origin = {};
+  var same_positions = [];
+  var popups = {};
+  map = new OpenLayersViewer('contentMap', map_source, <%= map_lat.to_f %>, <%= map_lng.to_f %>, <%= map_zoom %>);
+
+  var group = map._map_canvas.getLayerGroup();
+  var layers = group.getLayers().getArray();
+  var default_base = layers[0];
+
+  if ( map_source == 'webtis') {
+    var additional_base = new ol.layer.Tile({
+      source: new ol.source.OSM(),
+      type: 'base'
+    });
+  } else {
+    var additional_base = new ol.layer.Tile({
+      source: new ol.source.XYZ({
+        attributions: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>国土地理院</a>",
+        url: "//cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
+        projection: "EPSG:3857"
+      }),
+      type: 'base'
+    });
+  }
+
+  map._map_canvas.addLayer(additional_base);
+  additional_base.setVisible(false);
+  if ( $.cookie('basemap') == 'true' ){
+    additional_base.setVisible(true);
+    default_base.setVisible(false);
+  }
+
+  $("#change-map").on('click',function(){
+     if (additional_base.getVisible()) {
+        additional_base.setVisible(false);
+        default_base.setVisible(true);
+        $.cookie('basemap', null);
+      } else {
+        additional_base.setVisible(true);
+        default_base.setVisible(false);
+        $.cookie('basemap','true');
+      }
+  });
+  var iconStyles = {};
+
+  var positionFeature = new ol.Feature();
+  var positionFeatures = [];
+
+  <%- if item.present? -%>
+  var coordinates = ol.proj.transform([<%= item.lng.presence %>, <%= item.lat.presence %>], "EPSG:4326", "EPSG:3857");
+  positionFeature.setGeometry(new ol.geom.Point(coordinates));
+  positionFeature.setProperties({'id': '<%= item.name %>'})
+  positionFeatures.push(positionFeature);
+  iconStyles['<%= item.name %>'] = "<%= item.icon_uri.present? ? item.icon_uri : '/_common/themes/openlayers/images/marker.png' %>";
+  origin['name'] = '<%= item.name %>';
+  origin['lat'] = <%= item.lat.presence %>;
+  origin['lng'] = <%= item.lng.presence %>;
+ <%- end -%>
+
+
+  var nearby_markers = JSON.parse($('#json-data').text());
+
+  for (var n = 0; n < nearby_markers.length; n++) {
+
+    if ( nearby_markers[n].lng != null && nearby_markers[n].lat != null){
+      var coordinates = ol.proj.transform([nearby_markers[n].lng, nearby_markers[n].lat], "EPSG:4326", "EPSG:3857");
+      var nearbyFeature = new ol.Feature();
+      nearbyFeature.setProperties({'id': nearby_markers[n].name})
+      nearbyFeature.setGeometry(new ol.geom.Point(coordinates));
+      positionFeatures.push(nearbyFeature);
+      if ( nearby_markers[n].icon_uri == null || nearby_markers[n].icon_uri == '') {
+        iconStyles[nearby_markers[n].name] = '/_common/themes/openlayers/images/marker.png';
+      } else {
+        iconStyles[nearby_markers[n].name] = nearby_markers[n].icon_uri;
+      }
+      if ( Object.keys(origin).length && origin['lat'] == nearby_markers[n].lat && origin['lng'] == nearby_markers[n].lng  ) {
+        same_positions.push(nearby_markers[n].name);
+      }
+    }
+  }
+
+
+  var cluster = new ol.source.Cluster({
+    source: new ol.source.Vector ({
+      features: positionFeatures
+    }),
+    distance: 5
+  })
+
+  var pointLayer = new ol.layer.Vector({
+    map: map._map_canvas,
+    source: cluster
+  });
+
+  pointLayer.setStyle(function(feature) {
+    var features = feature.get("features");
+    if (features.length == 1) {
+      selected = features[0];
+      return new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          opacity: 1,
+          src: iconStyles[selected.get("id")]
+        })
+       });
+    } else {
+      if ( features.length >= 11){
+        var icon = '/_common/themes/openlayers/images/ic-11.png';
+      } else {
+        var icon = '/_common/themes/openlayers/images/ic-' + ("00" + features.length).slice( -2 ) + '.png';
+      }
+      return new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          opacity: 1,
+          src: icon
+        })
+       });
+    }
+  });
+
+  map._map_canvas.addLayer(pointLayer);
+
+  var selectFeature = new ol.interaction.Select({layers: [pointLayer]});
+  map._map_canvas.addInteraction(selectFeature);
+
+  selectFeature.on('select', function(e) {
+    var selectedFeatures = e.selected[0].getProperties().features;
+    var nearbyMarkers = [];
+    for(var i = 0; i < selectedFeatures.length; i++) {
+      var selected = selectedFeatures[i];
+      var coordinate = selected.getGeometry().getCoordinates();
+      if( i == 0 ){
+        var markerId = selected.get('id');
+      } else {
+        nearbyMarkers.push(selected.get('id'));
+      }
+    }
+    displayFeatureInfo(coordinate, markerId, nearbyMarkers);
+  });
+
+  function showOriginFeature(){
+    if ( Object.keys(origin).length ) {
+      var coordinate = ol.proj.transform([origin['lng'], origin['lat']], "EPSG:4326", "EPSG:3857");
+      var markerId = origin['name'];
+      var nearbyMarkers = same_positions;
+      displayFeatureInfo(coordinate, markerId, nearbyMarkers);
+    }
+  }
+  showOriginFeature();
+
+  function displayFeatureInfo(coordinate, markerId, nearbyMarkers) {
+    var url = '<%= @node.public_uri %>_ID_'.replace(/_ID_/, markerId) + '/detail';
+    if ( nearbyMarkers.length > 0) {
+      var nearIds = nearbyMarkers.join('&names[]=');
+      url = url + '?names[]=' + nearIds;
+    }
+    $.get(url, function(result) {
+      var dom = $.parseHTML(result);
+      map._content.innerHTML = dom[0].data;
+      map._popoverlay.setPosition(coordinate);
+      popups[markerId] = {contents: map._content.innerHTML, coordinate: coordinate}
+    });
+  }
+
+  $(".displayFeature").on('click',function(){
+    selectFeature.getFeatures().clear();
+    var markerId = $(this).attr('id').replace(/feature/, '');
+    var markerItem = JSON.parse($(this).attr('data-coordinates'));
+    var coordinate = ol.proj.transform([markerItem.lng, markerItem.lat], "EPSG:4326", "EPSG:3857");
+    displayFeatureInfo(coordinate, markerId, []);
+    return false;
+  });
+});
+
+//]]>
+</script>
+<div id="contentMap">
+  <button id="change-map">背景地図切り替え</button>
+</div>
+<div id="popup" class="ol-popup">
+  <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+  <div id="popup-content"></div>
+</div>

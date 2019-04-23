@@ -1,0 +1,156 @@
+ja:
+  activerecord:
+    models:
+      gis/entry: 地理情報
+      gis/layer: レイヤー    
+      gis/map: 個別地図
+      gis/folder: フォルダー    
+      gis/folder_layer: フォルダ-レイヤーリレーション   
+      gis/icon: アイコン管理    
+      gis/drawing_setting: 描画設定 
+      gis/import: インポート
+      gis/import_entry: インポートデータ    
+      gis/category: カテゴリ    
+      gis/categorization: カテゴリ　リレーション管理   
+      gis/registration: 登録・変更申請情報
+      gis/recommend: おすすめ検索 
+      gis/geocoding_entry: ジオコーディングタスク
+    attributes:
+      gis/entry:
+        title: 名称
+        name: ディレクトリ
+        item_value: 詳細情報
+        created_at: 作成日時
+        updated_at: 更新日時
+        editable_groups: 編集可能グループ
+        db: データベース設定
+        in_category_ids: カテゴリー
+        geometry_type: 種別
+        db_id: データベース設定
+        results: 施設一覧
+        conditions: 検索条件
+        state: 状態
+        summary: 概要
+        description: 説明
+      gis/registration:
+        title: 名称
+        name: ディレクトリ
+        item_value: 詳細情報
+        created_at: 作成日時
+        updated_at: 更新日時
+        editable_groups: 編集可能グループ
+        db: データベース設定
+        in_category_ids: カテゴリ
+        email: 申請者メールアドレス
+        contributor: 申請者氏名
+        state: 状態
+        remote_addr: IPアドレス
+        user_agent: ユーザーエージェント
+      gis/category:
+        name: カテゴリID
+        title: カテゴリ名
+        sort_no: 並び順
+        updated_at: 更新日時
+        state: 状態
+        description: 説明
+        sitemap_state: サイトマップ
+        docs_order: 記事表示順
+        template_id: テンプレート
+        icon_uri: アイコン画像URL
+      gis/categorization:
+        sort_no: 並び順
+      gis/layer:
+        content_id: コンテンツ
+        state: 状態
+        title: 名称
+        name: ID
+        body: 凡例
+        db_id: データベースID
+        item_values: データ抽出条件
+        display_limit: 表示件数
+        sort_no: 並び順
+        kind: レイヤー種別
+        opacity: 透明度
+        extent: 画像表示範囲
+        use_export_csv: CSVエクスポートの許可
+        use_export_kml: KMLエクスポートの許可
+        use_export_kml_no_label: KML（無記名）エクスポートの許可
+        use_slideshow: 写真スライドショー
+        enable_slideshow: 許可
+        srid: SRID（空間参照 ID）
+        geometry_type: 地理情報種別
+        created_at: 作成日時
+        updated_at: 更新日時
+        export_config: 公開画面エクスポート設定
+        in_category_ids: カテゴリー
+        editable_groups: 編集可能グループ
+        db: データベース設定
+      gis/recommend:
+        content_id: コンテンツ
+        state: 状態
+        title: 名称
+        name: ID
+        db_id: データベースID
+        item_values: 検索条件
+        sort_no: 並び順
+        operator_type: 検索条件
+        in_category_ids: カテゴリ
+        body: 説明
+        icon_uri: アイコン画像URL
+      gis/map:
+        state: 状態
+        title: 名称
+        name: ID
+        sort_no: 並び順
+        body: 説明
+        message: ご利用上の注意
+        icon_file: アイコン
+        tumbnail_file: サムネイル
+        folders: フォルダ
+        layers: レイヤー
+        in_category_ids: カテゴリー
+        editable_groups: 編集可能グループ
+      gis/folder:
+        state: 状態
+        title: 名称
+        sort_no: 並び順
+        body: 説明
+        message: ご利用上の注意
+        folders: フォルダ
+        layers: レイヤー
+      gis/drawing_setting:
+        layer_id: レイヤー
+        geometry_type: 地理情報タイプ
+        label_column: ラベル設定
+        label_color: ラベル色設定
+        point_color: 点の色
+        line_color: 線の色
+        line_width: 線の太さ
+        polygon_color: 面の色
+        created_at: 作成日
+        created_user: 作成者
+        created_group: 作成者所属
+        updated_at: 更新日
+        updated_user: 更新者
+        updated_group: 更新者所属
+        deleted_at: 削除日
+        deleted_user: 削除者
+        deleted_group: 削除者所属
+        base: 基本設定
+        draw: 描画設定
+        label_position: ラベル表示位置
+        label_size: ラベルのサイズ
+      gis/piece/form:
+        target_db_id: 対象データベース
+      gis/piece/facility_count:
+        target_db_id: 対象データベース
+        message_text: メッセージ
+        unit_text: 単位
+      gis/piece/recommend:
+        in_recommend_ids: おすすめ検索 
+      gis/piece/simple_form:
+        in_recommend_ids: おすすめ検索 
+        in_titles: 項目名
+        in_lower_texts: 項目下部表示テキスト
+        upper_text: 上部表示テキスト
+        lower_text: 下部表示テキスト

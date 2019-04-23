@@ -1,0 +1,17 @@
+<div class="search_categories">
+  <div class="title">カテゴリ</div>
+  <div class="conditions">
+    <%- @categories.each do |category| -%>
+      <div class="<%= category.name -%>">
+        <label>
+        <%= check_box_tag "category_ids[]", category.id,
+          params[:category_ids] ? params[:category_ids].index(category.id).present? : false,
+          id: "categories_#{category.name}" %>
+          <%= category.title %></label>
+        <%- unless category.children.empty? -%>
+        <%= render 'gis/public/_partial/categories/categories', categories: category.public_children %>
+        <%- end -%>
+      </div>
+    <%- end -%>
+  </div>
+</div>

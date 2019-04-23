@@ -1,0 +1,41 @@
+<%= render 'shared/admin/piece/show' do -%>
+<p class="form">詳細設定</p>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :upper_text %></th>
+    <td><%= hbr @item.upper_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :lower_text %></th>
+    <td><%= hbr @item.lower_text %></td>
+  </tr>
+</table>
+<p class="form">表示項目設定</p>
+<% if @item.titles.present? -%>
+  <%- @item.titles.each do |i, title| -%>
+  <table class="show recommendTitles">
+    <tr>
+      <th><%= @item.class.human_attribute_name :in_titles %></th>
+      <td><%= hbr title %></td>
+    </tr>
+    <tr>
+      <th><%= @item.class.human_attribute_name :in_recommend_ids %></th>
+      <td>
+        <%-
+        title_recommends = []
+        @item.content.recommends_for_option.each do |r| -%>
+          <%- title_recommends << r[0] if @item.in_recommend_ids[i].present? && @item.in_recommend_ids[i].include?(r[1].to_s) %>
+        <%- end %>
+        <%= title_recommends.join(",") %>
+      </td>
+    </tr>
+    <tr>
+      <th><%= @item.class.human_attribute_name :in_lower_texts %></th>
+      <td><%= hbr @item.in_lower_texts[i]  if @item.in_lower_texts[i].present?  %></td>
+    </tr>
+  </table>
+  <%- end -%>
+<%- end -%>
+
+<%- end -%>
+

@@ -1,0 +1,23 @@
+<%= page_entries_info @items -%>
+
+<table class="index">
+  <tr>
+    <th style="text-align: center; width: 80px;">詳細</th>
+    <th style="text-align: center; width: 100px;">フォルダー</th>
+    <th>名称</th>
+    <th style="text-align: center; width: 120px;"><%= Gis::Map.human_attribute_name :updated_at %></th>
+    <th style="text-align: center; width: 120px;"><%= Gis::Map.human_attribute_name :state %></th>
+  </tr>
+
+  <% @items.each do |item| %>
+  <tr class="<%= cycle '', 'cycle' %>">
+    <td style="text-align: center;"><%= link_to :show, { action: :show, id: item } %></td>
+    <td style="text-align: center;"><%= link_to "設定", gis_portal_map_folders_path(portal_map_id: item)%></td>
+    <td><%=item.title %></td>
+    <td style="text-align: center;"><%=l item.updated_at %></td>
+    <td style="text-align: center;"><%= item.state_text %></td>
+  </tr>
+  <% end %>
+</table>
+
+<%= paginate @items %>

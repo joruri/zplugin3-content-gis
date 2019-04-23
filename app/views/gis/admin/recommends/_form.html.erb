@@ -1,0 +1,47 @@
+<%= init_ckeditor baseHref: "#{gis_layer_path(content: @content, id: @item.id.to_i)}/" %>
+<span class="note">※は必須項目です。</span>
+
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= f.label :state %></th>
+    <td><%= f.collection_radio_buttons :state, @item.class.state_options, :last, :first %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :name %></th>
+    <td><%= f.text_field :name, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :title %></th>
+    <td><%= f.text_field :title, class: 'name' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :sort_no %></th>
+    <td><%= f.text_field :sort_no, class: 'id' %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :body %></th>
+    <td><%= f.text_area :body %></td>
+  </tr>
+  <tr>
+    <th><%= f.label :icon_uri, 'アイコン画像URL' %></th>
+    <td><%= f.text_field :icon_uri, class: 'name', style: 'width: 500px;' %></td>
+  </tr>
+</table>
+
+
+<p class="form">検索条件</p>
+
+<table class="show">
+  <tr>
+    <th><%= f.label :operator_type %></th>
+    <td><%= f.collection_radio_buttons :operator_type, @item.class.operator_type_options, :last, :first %></td>
+  </tr>
+</table>
+
+<%= render 'gis/admin/shared/form_search', f: f, item: @item, content: @content %>
+
+<%= render 'gis/admin/_partial/categories/form', f: f, item: @item, content: @content %>
+
+<br />
+<%= creator_form f %>

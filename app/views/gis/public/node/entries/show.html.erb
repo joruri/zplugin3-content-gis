@@ -1,0 +1,27 @@
+<div class="contentGisDetail">
+  <% if @db.present? %>
+  <% entry_detail_body = entry_body(@list_style, @db, @item) %>
+  <%= raw entry_detail_body.gsub(/\/_system\/(.*?)file_contents\//, "#{@item.name}/file_contents/") if entry_detail_body %>
+  <% else %>
+  <div class="title"><%= @item.title %></div>
+  <div class="body"><%= sanitize @item.description %></div>
+  <% end %>
+
+  <div id="facilityMap">
+    <h2>地図</h2>
+    <% if @translated %>
+    <%= gmap_view(@item, nearby_markers: @nearby_facilities, translated: @translated) %>
+    <% elsif @content.site.map_source == 'google' %>
+    <%= gmap_view(@item, nearby_markers: @nearby_facilities, translated: nil) %>
+    <% else %>
+    <%= gis_public_map_view(@item, nearby_markers: @nearby_facilities) %>
+    <% end %>
+    <div id="functions">
+      <ul>
+        <li><%= link_to "現在地からのルートを見る", @item.navigaton_uri, id: "navigationRoute" %></li>
+        <li><%= link_to "Google Mapで見る", @item.google_map_uri, id: "showGmap" %></li>
+      </ul>
+    </div>
+  </div>
+
+</div>

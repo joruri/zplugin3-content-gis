@@ -1,0 +1,7 @@
+<%= form_for @item, as: :item, url: { action: :create,
+                                      content: @content,
+                                      category_id: @parent_category.try(:id).to_i } do |f| %>
+  <%= error_messages_for :item %>
+  <%= render 'form', f: f %>
+  <%= submit @content.submit_state_options(Core.user) %>
+<% end %>

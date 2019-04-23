@@ -1,0 +1,7 @@
+<%- node.content.entries.public_state.order(:name, :id).preload(content: :node).each do |entry| -%>
+<url>
+<loc><%= entry.public_full_uri %></loc>
+<lastmod><%= (file_mtime(entry.public_path) || Time.now).iso8601 %></lastmod>
+<priority>0.8</priority>
+</url>
+<%- end -%>

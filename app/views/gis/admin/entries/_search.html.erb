@@ -1,0 +1,74 @@
+<%-
+category_options = @content.categories_for_option
+category_ids = params.dig(:criteria, :category_ids) || []
+-%>
+
+<%= form_tag url_for(action: :index), method: :get, class: 'search' do -%>
+<%= hidden_field_tag :detail_flag, params[:detail_flag] %>
+<%= hidden_field_tag :target_state, params[:target_state] %>
+<%= hidden_field_tag :maps, params[:maps] %>
+<table>
+  <tr>
+    <th>タイトル・内容・ディレクトリ名など</th>
+    <th>カテゴリ</th>
+    <th>表示件数</th>
+    <td rowspan="4" class="submitters">
+      <%= submit_tag '検索', data: { disable_with: false } %>
+      <%= submit_tag 'リセット', name: 'reset_criteria', data: { disable_with: false } %>
+    </td>
+  </tr>
+  <tr>
+    <td><%= text_field_tag 'criteria[free_word]', params.dig(:criteria, :free_word), style: 'width: 280px;' %></td>
+    <td>
+      <%= select_tag 'criteria[category_ids][]', options_for_select(category_options, category_ids[0]),
+            include_blank: true, id: "criteria_category_ids_0" %>
+    </td>
+    <td><%= select_tag 'limit', options_for_select(@content.class::LIMIT_OPTIONS, params[:limit]) %></td>
+  </tr>
+  <tr>
+    <th>データベース</th>
+    <th>所属</th>
+    <th>作成者</th>
+  </tr>
+  <tr>
+    <td>
+      <%= select_tag 'criteria[db_id]', options_for_select(@content.form_db_options, params.dig(:criteria, :db_id)), include_blank: true %>
+    </td>
+    <td><%= select_tag 'criteria[creator_group_id]',
+                       options_for_select(Core.site.groups_for_option, params.dig(:criteria, :creator_group_id)), include_blank: true %></td>
+    <td><%= text_field_tag 'criteria[creator_user_name]', params.dig(:criteria, :creator_user_name), style: 'width: 150px;' %></td>
+  </tr>
+  <tr>
+    <td id="database_body_form" colspan="3"></td>
+  </tr>
+</table>
+
+<%- end -%>
+
+<%- if @content.webdb_content_db -%>
+<script type="text/javascript">
+$(document).ready(function() {
+
+  changeDbForm($('#criteria_db_id').val());
+
+  $('#criteria_db_id').on('click', function() {
+  }).on('change', function() {
+    changeDbForm(this.value)
+  });
+
+  function changeDbForm(db_id){
+    if (db_id != '') {
+      $.post('<%= build_webdb_db_items_path(@content.webdb_content_db, db_id: '_ID_', public_search: true) %>'.replace(/_ID_/, db_id), $('form').serialize(), function(data) {
+        $('#database_body_form').html(data);
+      });
+      $('#database_body_form').show();
+    } else {
+      $('#database_body_form').hide().html('');
+    }
+  }
+
+});
+</script>
+<%- end -%>
+
+

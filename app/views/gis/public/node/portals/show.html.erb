@@ -1,0 +1,150 @@
+
+<div class="contentGisPortal">
+  <%= javascript_include_tag '/_common/js/openlayers/ol.js' %>
+  <%= javascript_include_tag '/_common/modules/map/js/portal.js' %>
+  <div id="portalTitle">
+    <%= image_tag @portal.icon_src %>
+    <h1><%= @portal.title %></h1>
+    <span class="department"><%= @portal.creator.try(:group).try(:name) %></span>
+  </div>
+  <div id="leftPanel">
+    <ul>
+      <li><%= link_to "レイヤー", "#layers", class: "showListTab active"%></li>
+      <li><%= link_to "地名検索", "#geocoding", class: "showListTab"%></li>
+    </ul>
+    <div id="layers" class="tabContent">
+      <%- @folders.each_with_index do | folder, i | -%>
+      <div id="title<%=i%>" class="title<%=i%> layerTitleLink">
+        <input class="allCheck" id="allCheck" name="allCheck" type="checkbox" value="<%= i %>" />
+        <a  class="layerTitle" href="#" id="titleLink"><%=folder.title%></a>
+      </div>
+      <div class="layerBody body" id="layerBody<%=i%>">
+        <%
+        folder.layers.public_state.each_with_index do |layer, m|
+          checked = false
+        -%>
+          <%=check_box_tag("feature_layer", layer.name, checked, id: "#{layer.name}_#{i}", class: "featureLayer layerCheck#{i}")%>
+          <label for="<%=layer.name%>_<%=i%>"><%=layer.title%></label><br />
+         <%- end -%>
+       </div>
+      <%- end -%>
+    </div>
+    <div id="geocoding" class="tabContent" style="display: none;">
+      <%= form_for :item, :url => "#{@node.public_uri}geocoding", :html => {:method => :get, :multipart => true, :id=>"geoCodingForm"} do |f|%>
+      <%= text_field_tag :address, "", :id=>"geocodeAdress", :style=>"width : 180px"%>
+      <%=f.submit :value=>"送信"%>
+      <% end %>
+    </div>
+  </div>
+  <div id="mapPanel">
+    <div id="toolbar">
+      <%= select_tag :area, options_for_select([], nil), include_blank: true %>
+      <%= link_to "印刷", "#", id: 'printBtn' %>
+      <%= link_to "作図", "#", id: 'drawBtn', class: 'openDialog' %>
+      <%= link_to "リンク", "#", id: 'linkBtn', class: 'openDialog' %>
+      <%= link_to "計測", "#", id: 'measureBtn', class: 'openDialog' %>
+      <%= link_to "出力", "#", id: 'exportBtn', class: 'openDialog' %>
+      <%= link_to "ヘルプ", "#", id: 'helpBtn' %>
+      <%= link_to "凡例", "#", id:  'legendBtn'%>
+    </div>
+    <div id="contentMap"></div>
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
+  </div>
+  <div id="footerPanel">
+    <%= link_to "ご利用上の注意", "#", id: "reDisplayDialog"%>
+  </div>
+  <div id="dialogs">
+    <div id="message" title="ご利用上の注意">
+      <p>
+        <%= @portal.message %>
+      </p>
+    </div>
+    <div id="drawPanel" class="toolDialog" title="作図">
+    </div>
+    <div id="linkPanel" class="toolDialog" title="リンク">
+    </div>
+    <div id="measurePanel" class="toolDialog" title="計測">
+      <form class="form-inline">
+        <label>Measurement type &nbsp;</label>
+        <select id="type">
+          <option value="length">Length (LineString)</option>
+          <option value="area">Area (Polygon)</option>
+        </select>
+      </form>
+    </div>
+    <div id="exportPanel" class="toolDialog" title="出力">
+    </div>
+  </div>
+
+</div>
+<%-
+default_position = default_map_position(@content)
+map_lat  = default_position[0]
+map_lng  = default_position[1]
+map_zoom = 14
+map_config = {lat: map_lat, lng: map_lng, zoom: map_zoom}
+-%>
+
+<script type="text/javascript">
+//<![CDATA[
+$(document).ready( function(){
+
+  $("#message").dialog({
+    modal: true,
+    buttons: {
+    "確認": function() {
+      $(this).dialog("close");
+      }}
+  });
+  $("#dialogs div.toolDialog").dialog({ autoOpen: false });
+
+  $(".openDialog").on("click",function(){
+    var id = $(this).attr("id").replace(/Btn/, 'Panel');
+    $("#" + id ).dialog("open");
+    return false;
+  });
+
+  $("#reDisplayDialog").on("click",function(){
+    $("#message").dialog("open");
+  });
+
+  $(".showListTab").on("click",function(){
+    var $th = $(this).index();
+    $(".showListTab").removeClass("active");
+    $(this).addClass("active");
+    var id = $(this).attr("href");
+    $(".tabContent").hide();
+    $(id).show();
+    return false;
+  });
+
+  var map = new OpenLayersPortalViewer('contentMap', '<%= @content.site.map_source %>', <%= map_lat.to_f %>, <%= map_lng.to_f %>, <%= map_zoom %>);
+
+  <%- @folders.each_with_index do | folder, i |
+    folder.layers.public_state.each_with_index do |layer, m|
+    -%>
+    map.create_vector_layer({name: '<%= layer.name %>', url: '<%= layer.public_json_uri %>'})
+    <%- end -%>
+   <%- end -%>
+
+  map.set_selector();
+
+  $(".featureLayer").on("change",function(){
+    var prop = $(this).prop('checked');
+    var val  = $(this).val();
+    map.toggle_layer(val, prop);
+  });
+
+  $(".allCheck").on("change",function(){
+    var prop = $(this).prop('checked');
+    var val  = $(this).val();
+    $("#layerBody" + val +  " input:checkbox").prop("checked",prop).change();
+  });
+
+});
+
+//]]>
+</script>

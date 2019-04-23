@@ -1,0 +1,74 @@
+<%= init_ckeditor readOnly: true %>
+
+<%= creator_view @item %>
+<p class="form">基本情報</p>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :state %></th>
+    <td><%= @item.state_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :name %></th>
+    <td><%= @item.name %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  <tr>
+    <th><%= @item.class.human_attribute_name :kind %></th>
+    <td><%= @item.kind_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :opacity %></th>
+    <td><%= @item.opacity_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :export_config%></th>
+    <td>
+      <%= content_tag(:div, @item.class.human_attribute_name(:use_export_csv)) if @item.use_export_csv %>
+      <%= content_tag(:div, @item.class.human_attribute_name(:use_export_kml)) if @item.use_export_kml %>
+      <%= content_tag(:div, @item.class.human_attribute_name(:use_export_kml_no_label)) if @item.use_export_kml_no_label %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :use_slideshow %></th>
+    <td>
+      <%= @item.class.human_attribute_name :enable_slideshow if @item.use_slideshow %>
+    </td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :srid %></th>
+    <td><%= @item.srid_text %></td>
+  </tr>
+  <tr>
+    <th><%= @item.class.human_attribute_name :geometry_type %></th>
+    <td><%= @item.geometry_type_text %></td>
+  </tr>
+</table>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :body %></th>
+  </tr>
+  <tr>
+    <td colspan="2" class="cke_editor_wrapper">
+      <%= text_area_tag "body",
+        @item.body.to_s.gsub(/file_contents\//, "#{@item.id}/file_contents/"),
+        class: 'ckeditor' %>
+    </td>
+  </tr>
+</table>
+
+<%= render 'sys/admin/_partial/files/view', item: @item, content: @content %>
+
+<p class="form">抽出条件</p>
+
+<%- if @item.db -%>
+<%= render 'webdb/admin/_partial/search/view', db: @item.db, item_values: @item.item_values,
+  files: @item.files,  file_uri: @item.file_content_uri %>
+<%- end -%>
+
+<%= render 'gis/admin/_partial/categories/view', item: @item%>
+
+<%= editable_group_view @item %>
+
+<%= creator_view @item %>

@@ -1,0 +1,18 @@
+<%= init_ckeditor readOnly: true %>
+<h2>詳細情報</h2>
+<%= render 'gis/public/_partial/categories/view', item: @item %>
+<%- if @registration_db -%>
+<%= render 'webdb/admin/shared/show', db: @registration_db, item_values: @item.item_values,
+  files: @item.files,  file_uri: @item.file_content_uri, use_admin: false,
+  skip_fields: @content.form_skip_fields %>
+<%- else -%>
+<table class="show">
+  <tr>
+    <th><%= @item.class.human_attribute_name :title %></th>
+    <td><%= @item.title %></td>
+  </tr>
+</table>
+<%- end -%>
+
+<h2>位置情報</h2>
+<%= gis_map_view @item %>

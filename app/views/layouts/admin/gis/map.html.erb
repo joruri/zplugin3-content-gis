@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title><%= Core.title %></title>
+  <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/_common/favicon.ico" />
+  <link rel="icon" type="image/vnd.microsoft.icon" href="/_common/favicon.ico" />
+
+  <%= javascript_include_tag '/_common/js/jquery.min.js' %>
+  <%= javascript_include_tag '/_common/js/jquery-migrate.min.js' %>
+  <%= javascript_include_tag '/_common/js/jquery_ujs.js' %>
+  <%= javascript_include_tag '/_common/js/jquery.cookie.js' %>
+
+  <%= stylesheet_link_tag '/_common/css/jquery-ui-themes/smoothness/jquery-ui.min.css', media: :all %>
+  <%= javascript_include_tag '/_common/js/jquery-ui.min.js' %>
+  <%= stylesheet_link_tag '/_common/css/jquery-ui-timepicker-addon.min.css', media: :all %>
+  <%= javascript_include_tag '/_common/js/jquery-ui-timepicker-addon.min.js' %>
+  <%= javascript_include_tag '/_common/js/jquery-ui-datepicker-ja.js' %>
+  <%= javascript_include_tag '/_common/js/jquery-ui-timepicker-addon-ja.js' %>
+
+  <%= stylesheet_link_tag '/_common/themes/admin/style.css', media: :all %>
+  <%= javascript_include_tag '/_common/js/cms_admin/cms.js' %>
+  <%= javascript_include_tag '/_common/js/cms_admin/form.js' %>
+  <%= javascript_include_tag '/_common/js/cms_admin/navi.js' %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <div id="container">
+    <div id="main">
+      <div id="content">
+        <%= render 'layouts/admin/cms/concept' %>
+        <div id="contentContainer">
+          <div id="contentHeader">
+            <%- if lookup_context.exists?('menu', controller.controller_path, true) -%>
+            <%= render controller.controller_path + '/menu' %>
+            <%- end -%>
+          </div>
+          <div id="contentBody">
+            <%= render 'layouts/admin/notice' %>
+            <%= yield %>
+          </div>
+          <div id="contentFooter"></div>
+        <!-- /#contentContainer --></div>
+      <!-- /#content --></div>
+    <!-- /#main --></div>
+    <footer id="footer">
+      <div id="footerContainer">
+        <%#= :footer %>
+      <!-- /#footerContainer --></div>
+    <!-- /#footer --></footer>
+  <!-- /#container --></div>
+</body>
+</html>

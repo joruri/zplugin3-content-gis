@@ -1,0 +1,158 @@
+<%= javascript_include_tag '/_common/js/openlayers/ol.js' %>
+<%= javascript_include_tag '/_common/modules/map/js/openlayers.js' %>
+<%= init_ckeditor readOnly: true %>
+<%-
+default_position = default_map_position(@content)
+map_lat  = default_position[0]
+map_lng  = default_position[1]
+map_zoom = 14
+map_config = {lat: map_lat, lng: map_lng, zoom: map_zoom}
+-%>
+<script type="text/javascript">
+$(function() {
+  $('#tabs').tabs({
+    active: 0
+  });
+  $('#tabs').show();
+});
+</script>
+
+<div id="gisContents">
+  <div id="tabs" class="tabs leftMenu">
+    <ul>
+      <li><a href="#markers">検索結果</a></li>
+      <li><a href="#searchForm">検索条件</a></li>
+    </ul>
+    <div id="markers">
+    <%= page_entries_info @items -%>
+    <%- for item in @items -%>
+    <div class="resultContent">
+    <div class="left"></div>
+    <div class="right">
+      <p class="shisetsuName">
+        <% if db = item.db %>
+        <%= simple_format entry_title_value(item, item.db, item.files).gsub(/file_contents\//, "#{item.id}/file_contents/") %>
+        <%- else -%>
+        <%= item.title -%>
+        <%- end -%>
+      </p>
+      <p class="shosai">
+        <%= link_to "表示", "##{item.name}", class: "displayFeature", id: "feature#{item.id}",
+                    'data-coordinates': {lat: item.lat, lng: item.lng}.to_json %></p>
+    </div>
+    </div>
+    <%- end -%>
+    <%= paginate @items %>
+    </div>
+    <div id="searchForm">
+    <%= render 'search' -%>
+    </div>
+  </div>
+
+  <div id="indexMap" data-config='<%= map_config.to_json %>'></div>
+  <div id="popup" class="ol-popup" style="display: none;">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content"></div>
+  </div>
+</div>
+<script type="text/javascript">
+//<![CDATA[
+
+$(function() {
+  var me = null;
+  var config = JSON.parse($("#indexMap").attr('data-config'));
+
+  map = new OpenLayersViewer('indexMap', '<%= @content.site.map_source %>', parseFloat(config.lat), parseFloat(config.lng), config.zoom);
+  var popups = {};
+
+  var positionFeatures = [];
+
+  var markerStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+      anchor: [0.5, 1],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'fraction',
+      opacity: 0.75,
+      src: '/_common/themes/openlayers/images/marker.png'
+    })
+   });
+
+  <%- @items.each_with_index do |item, i|
+    next if item.geom.blank?
+  -%>
+    <%- if item.lng.present? && item.lat.present? -%>
+    var positionFeature = new ol.Feature();
+    positionFeature.setProperties({'id': <%= item.id %>});
+    positionFeature.setStyle(markerStyle);
+    var coordinates = ol.proj.transform([<%= item.lng.to_f %>, <%= item.lat.to_f %>], "EPSG:4326", "EPSG:3857");
+    positionFeature.setGeometry(new ol.geom.Point(coordinates));
+    positionFeatures.push(positionFeature);
+    <%- else -%>
+    var format = new ol.format.WKT();
+    var wkt = "<%= item.geom.as_text %>";
+    var feature = format.readFeature(wkt, {
+        dataProjection: 'EPSG:4326',
+        featureProjection: 'EPSG:3857'
+      });
+    feature.setProperties({'id': <%= item.id %>});
+    positionFeatures.push(feature);
+    <%- end -%>
+  <%- end -%>
+
+  var vectorLayer = new ol.layer.Vector({
+    map: map._map_canvas,
+    source: new ol.source.Vector ({
+      features: positionFeatures
+    })
+  });
+  map._map_canvas.addLayer(vectorLayer);
+
+  var extent = vectorLayer.getSource().getExtent();
+  map._map_canvas.getView().fit(extent);
+
+  var selectSingleClick = new ol.interaction.Select({layers : [vectorLayer]});
+  map._map_canvas.addInteraction(selectSingleClick);
+
+  function displayFeatureInfo(coordinate, markerId){
+    var url = '<%= gis_entry_path(@content.id, id: '_ID_', detail: true) %>'.replace(/_ID_/, markerId);
+    if (popups[markerId]) {
+        map._content.innerHTML = popups[markerId].contents;
+        map._popoverlay.setPosition(popups[markerId].coordinate);
+    } else {
+      $.get(url, function(data) {
+        map._content.innerHTML = data;
+        map._popoverlay.setPosition(coordinate);
+        popups[markerId] = {contents: map._content.innerHTML, coordinate: coordinate}
+      });
+    }
+
+  }
+
+  selectSingleClick.on('select', function(e) {
+    var selectedFeatures = e.selected;
+    for(var i = 0; i < selectedFeatures.length; i++) {
+      var markerId = selectedFeatures[i].get('id');
+      var geomExtent = e.selected[0].getGeometry().getExtent();
+      var coordinate = ol.extent.getCenter(geomExtent);
+      displayFeatureInfo(coordinate, markerId);
+    }
+  });
+
+  $(".displayFeature").on('click',function(){
+    selectSingleClick.getFeatures().clear();
+    var markerId = $(this).attr('id').replace(/feature/, '');
+    for(var i = 0; i < positionFeatures.length; i++) {
+      var feature = positionFeatures[i];
+      if ( feature.get('id') == markerId ){
+        var geomExtent = feature.getGeometry().getExtent();
+        var coordinate = ol.extent.getCenter(geomExtent);
+        displayFeatureInfo(coordinate, markerId);
+      }
+    }
+  });
+
+
+});
+
+//]]>
+</script>
