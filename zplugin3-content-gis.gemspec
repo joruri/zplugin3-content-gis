@@ -9,9 +9,9 @@ Gem::Specification.new do |s|
   s.version     = Zplugin3::Content::Gis::VERSION
   s.authors     = [""]
   s.email       = [""]
-  s.homepage    = "https://github.com/tao-k/zplugin3-content-gis"
-  s.summary     = "Geographic Information System Content for ZOMEKIv3"
-  s.description = "Add Geographic Information System to ZOMEKI v3"
+  s.homepage    = "https://github.com/joruri/zplugin3-content-gis"
+  s.summary     = "Geographic Information System Content for JoruriCMS2017"
+  s.description = "Add Geographic Information System to JoruriCMS2017"
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
