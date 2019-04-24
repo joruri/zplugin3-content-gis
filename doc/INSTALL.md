@@ -1,4 +1,4 @@
-# JoruriCMS2017 地理情報プラグイン インストールマニュアル
+# Joruri CMS 2017 地理情報プラグイン インストールマニュアル
 
 ## 1.想定環境
 
@@ -11,15 +11,15 @@
 * Geospatial Database Module: PostGIS 2.4
 * Ruby: 2.6
 * Rails: 5.2
-* JoruriCMS 2017 Release4
+* Joruri CMS 2017 Release4
 
-## 2.JoruriCMS2017インストール
+## 2.Joruri CMS 2017インストール
 
-JoruriCMS2017のインストールを実施する
+Joruri CMS 2017のインストールを実施する
 
 ## 3.プラグイン機能の有効化
 
-JoruriCMS2017のプラグイン機能を有効化する。
+Joruri CMS 2017のプラグイン機能を有効化する。
 
     # su - joruri
     $ cd /var/www/joruri
@@ -39,14 +39,14 @@ JoruriCMS2017のプラグイン機能を有効化する。
     # yum -y install postgis24_95 postgis24_95-utils postgis24_95-client
     # yum -y install postgis24_95-devel
 
-PostGISを既存のJoruriCMS2017のデータベースにインストールします
+PostGISを既存のJoruri CMS 2017のデータベースにインストールします
 
     # su - postgres -c "psql joruri_production -f /usr/pgsql-9.5/share/contrib/postgis-2.4/postgis.sql"
     # su - postgres -c "psql joruri_production -f /usr/pgsql-9.5/share/contrib/postgis-2.4/spatial_ref_sys.sql"
 
 ## 5.地理情報プラグインのインストール
 
-JoruriCMS2017管理画面にアクセスし、地理情報プラグインをインストール
+Joruri CMS 2017管理画面にアクセスし、地理情報プラグインをインストール
 
 * https://github.com/joruri/zplugin3-content-gis
 
