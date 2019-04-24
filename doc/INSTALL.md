@@ -17,7 +17,20 @@
 
 JoruriCMS2017のインストールを実施する
 
-## 3.PostGISのインストール
+## 3.プラグイン機能の有効化
+
+JoruriCMS2017のプラグイン機能を有効化する。
+
+    # su - joruri
+    $ cd /var/www/joruri
+    $ vi config/application.yml
+```
+  # ツールメニュー表示
+  show_tool_menu: true #falseからtrueに変更
+```
+    $ bundle exec rake unicorn:restart RAILS_ENV=production
+
+## 4.PostGISのインストール
 地理空間情報関連パッケージをインストールします。
 
     # yum -y install gd gd-devel proj proj-devel proj-epsg libicu libicu-devel unixODBC unixODBC-devel libxml2 libxml2-devel
@@ -31,7 +44,7 @@ PostGISを既存のJoruriCMS2017のデータベースにインストールしま
     # su - postgres -c "psql joruri_production -f /usr/pgsql-9.5/share/contrib/postgis-2.4/postgis.sql"
     # su - postgres -c "psql joruri_production -f /usr/pgsql-9.5/share/contrib/postgis-2.4/spatial_ref_sys.sql"
 
-## 4.地理情報プラグインのインストール
+## 5.地理情報プラグインのインストール
 
 JoruriCMS2017管理画面にアクセスし、地理情報プラグインをインストール
 
@@ -61,12 +74,14 @@ JoruriCMS2017管理画面にアクセスし、地理情報プラグインをイ�
 
 登録後、一覧画面から「アプリ再起動」を実施する。
 
-## 5.地理情報プラグインのマイグレーションを実行
+## 6.地理情報プラグインのマイグレーションを実行
 
 gemの更新を行い、コンテンツプラグインをダウンロードする。
     # su - joruri -c 'export LANG=ja_JP.UTF-8; cd /var/www/joruri && bundle install'
 
 データベースのアダプターをpostgisに変更する。
+    # su - joruri
+    $ cd /var/www/joruri
     $ vi config/database.yml
 ```
 default: &default
@@ -82,7 +97,7 @@ default: &default
     # su - joruri -c 'export LANG=ja_JP.UTF-8; cd /var/www/joruri && bundle exec rake zplugin3_content_gis:entry:copy_images RAILS_ENV=production'
     # su - joruri -c 'export LANG=ja_JP.UTF-8; cd /var/www/joruri && bundle exec rake joruri:maintenance:common_dir:copy RAILS_ENV=production'
 
-## 6.サーバー再起動
+## 7.サーバー再起動
 
 unicornとdelayed_jobを再起動する。
 
