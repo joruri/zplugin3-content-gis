@@ -16,7 +16,7 @@ JoruriCMS2017で利用できる地理情報コンテンツプラグインです�
 
 ## インストール
 
-サーバー上で地理情報関連のパッケージをインストール後、ZOMEKIの管理画面からプラグインを追加します。
+サーバー上で地理情報関連のパッケージをインストール後、JoruriCMS2017の管理画面からプラグインを追加します。
 地理情報関連のパッケージの導入を含むインストール手順については、doc/INSTALL.mdを参照してください。
 
 ## License
@@ -27,3 +27,5 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 このアプリケーションでは以下のジオコーディングサービスを利用しています。
 [CSISシンプルジオコーディング実験（街区レベル位置参照情報）](http://newspat.csis.u-tokyo.ac.jp/geocode/modules/geocode/index.php?content_id=1)
+
+
