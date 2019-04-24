@@ -57,7 +57,7 @@ Joruri CMS 2017管理画面にアクセスし、地理情報プラグインを�
 |URL|https://github.com/|
 |プラグイン名|joruri/zplugin3-content-gis|
 |タイトル|地理情報プラグイン|
-|バージョン|master|
+|バージョン|branch/master|
 
 また、地理情報プラグインは下記のデータベースプラグインと連携しているため、併せてインストールする。
 
@@ -70,7 +70,7 @@ Joruri CMS 2017管理画面にアクセスし、地理情報プラグインを�
 |URL|https://github.com/|
 |プラグイン名|joruri/zplugin3-content-webdb|
 |タイトル|データベース|
-|バージョン|master|
+|バージョン|branch/master|
 
 登録後、一覧画面から「アプリ再起動」を実施する。
 
